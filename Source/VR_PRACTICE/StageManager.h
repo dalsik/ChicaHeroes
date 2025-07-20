@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "BacteriaBase.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
 #include "StageManager.generated.h"
 
 UCLASS()
@@ -28,14 +30,39 @@ public:
 	void RegisterBacteria(ABacteriaBase* Bacteria);
 	void UnregisterBacteria(ABacteriaBase* Bacteria);
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stage")
+	TArray<TSubclassOf<ABacteriaBase>> Enemy;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stage")
+	int EnemyCount;
+
 	UPROPERTY(BlueprintReadOnly)
 	TArray<ABacteriaBase*> RegisteredBacteria;
 
 	UFUNCTION()
-	void HandlePlayerAttacked();
+	void HandlePlayerAttacked(ABacteriaBase* Attacker);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Stage")
-	void OnPlayerAttackedBP();
+	void OnPlayerAttackedBP(float Damage);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Stage")
+	void GameResult();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Stage")
+	void TimeOver();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Stage")
+	void GameClear();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Stage")
+	void MonsterInfo();
+
+	//UFUNCTION(BlueprintImplementableEvent, Category = "Stage")
+	//void SpawnEnemy();
+	void SpawnEnemy();
+
+	UFUNCTION(BlueprintCallable, Category = "Stage")
+	void TickDisable();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	APostProcessVolume* TargetPostProcessVolume;
@@ -43,60 +70,33 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	APawn* PlayerPawn;
 
-private:
-	// 현재 등록된 박테리아들
-
 	UPROPERTY(VisibleAnywhere, Category = "StageSystem")
+	float Time = 100.f;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bCleared = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "StageSystem")
 	int StageNum = 0;
-	UPROPERTY(VisibleAnywhere, Category = "StageSystem")
-	float Time = 90.f;
 
-	UPROPERTY(EditAnywhere, Category = "Stage1")
-	TSubclassOf<ABacteriaBase> Stage1Enemy1;
-	UPROPERTY(EditAnywhere, Category = "Stage1")
-	int Stage1Enemy1Count = 1;
-	UPROPERTY(EditAnywhere, Category = "Stage1")
-	TSubclassOf<ABacteriaBase> Stage1Enemy2;
-	UPROPERTY(EditAnywhere, Category = "Stage1")
-	int Stage1Enemy2Count = 1;
-
-	UPROPERTY(EditAnywhere, Category = "Stage2")
-	TSubclassOf<ABacteriaBase> Stage2Enemy1;
-	UPROPERTY(EditAnywhere, Category = "Stage2")
-	int Stage2Enemy1Count = 1;
-	UPROPERTY(EditAnywhere, Category = "Stage2")
-	TSubclassOf<ABacteriaBase> Stage2Enemy2;
-	UPROPERTY(EditAnywhere, Category = "Stage2")
-	int Stage2Enemy2Count = 1;
-
-	UPROPERTY(EditAnywhere, Category = "Stage3")
-	TSubclassOf<ABacteriaBase> Stage3Enemy1;
-	UPROPERTY(EditAnywhere, Category = "Stage3")
-	int Stage3Enemy1Count = 1;
-	UPROPERTY(EditAnywhere, Category = "Stage3")
-	TSubclassOf<ABacteriaBase> Stage3Enemy2;
-	UPROPERTY(EditAnywhere, Category = "Stage3")
-	int Stage3Enemy2Count = 1;
+private:
+	UNiagaraSystem* NiagaraEffect;
 
 	FTimerHandle SpawnTimerHandle;
 	FTimerHandle DelayStartHandle;
 
 	bool bStageStarted = false; // Stage1 스폰 여부
 
-	int32 TotalSpawnCount;
-	int32 SpawnedCount;
+	//int32 SpawnedCount;
 
-	TSubclassOf<ABacteriaBase> EnemyClass1;
-	TSubclassOf<ABacteriaBase> EnemyClass2;
-	int32 Count1;
-	int32 Count2;
+	int32 Count;
 
 	int32 SpawnPhase; // 1 또는 2
+	bool bAllSpawned = false;
 
 	FVector SpawnOrigin;
 	float SpawnRadius;
 	void StartFirstStage();
 	void SpawnNextEnemy();
-	void SpawnEnemy(TSubclassOf<ABacteriaBase> Enemy1, int Enemy1Count, TSubclassOf<ABacteriaBase> Enemy2, int Enemy2Count);
-	void TickDisable();
 };
+

@@ -3,9 +3,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Camera/CameraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
 #include "BacteriaBase.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerAttacked);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerAttacked, ABacteriaBase*, Attacker);
 
 UCLASS()
 class VR_PRACTICE_API ABacteriaBase : public AActor
@@ -16,18 +18,31 @@ public:
     ABacteriaBase();
 
     virtual void Tick(float DeltaTime) override;
+    virtual void OnDeath() {};
 
-    // 데미지 입는 함수
-    virtual float TakeDamageBac(float DamageAmount);
+    // 예시: BacteriaBase.h
+    UFUNCTION(BlueprintCallable, Category = "Bacteria")
+    virtual void TakeDamageBac();
+
+    bool bShieldAnim = false;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shield")
-    float Shield = 0.f;
+    bool Shield = false;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shield")
-    float MaxShield = 50.f;
+    bool bShieldHitRecently = false;
 
     UPROPERTY(BlueprintAssignable)
     FOnPlayerAttacked OnPlayerAttacked;
+
+    // 공격력
+    UPROPERTY(EditAnywhere, Category = "Bacteria")
+    float AttackPower = 10.f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bacteria")
+    UStaticMeshComponent* ShieldMesh;
+
+    float getHealth();
 
 protected:
     virtual void BeginPlay() override;
@@ -48,11 +63,7 @@ protected:
 
     // 회전 속도
     UPROPERTY(EditAnywhere, Category = "Bacteria")
-    float TrackingSpeed = 1.5f;
-
-    // 공격력
-    UPROPERTY(EditAnywhere, Category = "Bacteria")
-    float AttackPower = 10.f;
+    float TrackingSpeed = 0.8f;
 
     // 공격 범위
     UPROPERTY(EditAnywhere, Category = "Bacteria")
@@ -75,4 +86,15 @@ protected:
 
     // 플레이어 위치 캐시
     FVector PlayerLocation;
+
+    UPROPERTY(EditAnywhere, Category = "RotateSpeed")
+    float SpinSpeedX = 30.f;
+
+    UPROPERTY(EditAnywhere, Category = "RotateSpeed")
+    float SpinSpeedY = 45.f;
+
+    UPROPERTY(EditAnywhere, Category = "RotateSpeed")
+    float SpinSpeedZ = 60.f;
+
+    virtual void ChildBegin() {};
 };

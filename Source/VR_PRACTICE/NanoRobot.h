@@ -15,6 +15,9 @@ public:
 	// Sets default values for this actor's properties
 	ANanoRobot();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ClearResult();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -29,5 +32,5 @@ public:
 	int StageCleared = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Danceindex = 0;
+	int DanceIndex = 0;
 };

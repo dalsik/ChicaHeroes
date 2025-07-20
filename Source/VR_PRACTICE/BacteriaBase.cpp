@@ -21,8 +21,22 @@ ABacteriaBase::ABacteriaBase()
 
     MeshComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore); // 서로 무시
 
+    ShieldMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShieldMesh"));
+    ShieldMesh->SetupAttachment(RootComponent);
+
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> ShieldAsset(TEXT("/Game/Niagara/Shield/IcoSphere.IcoSphere")); // 실제 경로로!
+    if (ShieldAsset.Succeeded())
+    {
+        ShieldMesh->SetStaticMesh(ShieldAsset.Object);
+    }
+
     // 초기 체력
     Health = 100.0f;
+}
+
+float ABacteriaBase::getHealth()
+{
+    return Health;
 }
 
 void ABacteriaBase::BeginPlay()
@@ -39,6 +53,12 @@ void ABacteriaBase::BeginPlay()
     {
         StageManager->RegisterBacteria(this);
     }
+    // 머티리얼/스케일/위치/투명도 등 추가 세팅
+    ShieldMesh->SetVisibility(Shield); // 처음엔 안 보이게
+    ShieldMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision); // 충돌 X
+    ShieldMesh->SetWorldScale3D(GetActorScale3D() * 2.f); // 본체보다 조금 크게
+
+    ChildBegin();
 }
 
 void ABacteriaBase::Tick(float DeltaTime)
@@ -50,29 +70,10 @@ void ABacteriaBase::Tick(float DeltaTime)
     }
 }
 
-float ABacteriaBase::TakeDamageBac(float DamageAmount)
+void ABacteriaBase::TakeDamageBac()
 {
-    float RemainingDamage = DamageAmount;
-
-    if (Shield > 0.f)
-    {
-        float Absorbed = FMath::Min(Shield, DamageAmount);
-        Shield -= Absorbed;
-        RemainingDamage -= Absorbed;
-
-        UE_LOG(LogTemp, Log, TEXT("[Bacteria] 보호막으로 %f 피해 흡수, 남은 보호막: %f"), Absorbed, Shield);
-    }
-
-    if (RemainingDamage > 0.f)
-    {
-        Health -= RemainingDamage;
-        if (Health <= 0.f)
-        {
-            Destroy();
-        }
-    }
-
-    return DamageAmount;
+    OnDeath();
+    Destroy();
 }
 
 void ABacteriaBase::Destroyed()

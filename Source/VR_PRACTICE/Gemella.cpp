@@ -19,17 +19,6 @@ AGemella::AGemella() {
 void AGemella::BeginPlay()
 {
     Super::BeginPlay();
-
-    PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-    if (PlayerPawn)
-    {
-        CameraComp = PlayerPawn->FindComponentByClass<UCameraComponent>();
-    }
-    AStageManager* StageManager = Cast<AStageManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStageManager::StaticClass()));
-    if (StageManager)
-    {
-        StageManager->RegisterBacteria(this);
-    }
     // 일정 시간마다 보호막 부여 함수 실행
     GetWorld()->GetTimerManager().SetTimer(
         ShieldGrantTimer,
@@ -38,6 +27,11 @@ void AGemella::BeginPlay()
         ShieldGrantInterval,
         true // 반복 호출
     );
+}
+
+void AGemella::OnDeath()
+{
+    GetWorld()->GetTimerManager().ClearTimer(ShieldGrantTimer);
 }
 
 void AGemella::Tick(float DeltaTime)
@@ -70,21 +64,33 @@ void AGemella::Tick(float DeltaTime)
 
 void AGemella::GrantShieldsToNearbyBacteria()
 {
-    TArray<AActor*> BacteriaList;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABacteriaBase::StaticClass(), BacteriaList);
+    APlayerCameraManager* CamMgr = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+    FRotator CamRot = CamMgr->GetCameraRotation();
 
-    for (AActor* Actor : BacteriaList)
+    FRotator WaveRot = FRotator(0.f, CamRot.Yaw, 0.f);
+    UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+        GetWorld(),
+        NiagaraEffect,          // NiagaraSystem* (에디터에서 할당)
+        GetActorLocation(),     // 바로 자기 위치!
+        GetActorRotation()     // 혹은 카메라 방향 등, 원하는 회전값
+    );
+    BacteriaList = Cast<AStageManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStageManager::StaticClass()))->RegisteredBacteria;
+    for (ABacteriaBase* Bacteria : BacteriaList)
     {
-        ABacteriaBase* Bacteria = Cast<ABacteriaBase>(Actor);
         if (!Bacteria || Bacteria == this) continue;
-
-        float DistanceToBacteria = FVector::Dist(Bacteria->GetActorLocation(), GetActorLocation());
-
-        if (Bacteria->Shield <= 0.f) // 보호막이 없을 때만 부여
+        if (!Bacteria->Shield && Bacteria->getHealth() > 0) // 보호막이 없을 때만 부여
         {
-            Bacteria->Shield = Bacteria->MaxShield;
+            Bacteria->Shield = true;
+            Bacteria->ShieldMesh->SetVisibility(true);
             UE_LOG(LogTemp, Log, TEXT("[Gemella] %s에게 보호막 부여"), *Bacteria->GetName());
         }
+    }
+    // 5. 충돌 판정
+    //UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), Distance);
+    if (CurrentState == EGemellaState::Wander)
+    {
+        OnPlayerAttacked.Broadcast(this);
+        UGameplayStatics::ApplyDamage(PlayerPawn, AttackPower, nullptr, this, nullptr);
     }
 }
 
@@ -113,6 +119,8 @@ void AGemella::HandleAttackState(float DeltaTime)
     {
         FVector RandOffset = UKismetMathLibrary::RandomUnitVector() * 600.f;
         RandomMoveTarget = GetActorLocation() + RandOffset;
+        if (RandomMoveTarget.Z <= CameraComp->GetComponentLocation().Z + 10.f)
+            RandomMoveTarget.Z = CameraComp->GetComponentLocation().Z + FMath::RandRange(10.f, 40.f);
     }
 
     MoveToward(RandomMoveTarget, DeltaTime);

@@ -9,6 +9,13 @@
 /**
  *
  */
+UENUM(BlueprintType)
+enum class EPorphyState : uint8
+{
+	Approaching,
+	Burst
+};
+
 UCLASS()
 class VR_PRACTICE_API APorphy : public ABacteriaBase
 {
@@ -19,13 +26,20 @@ public:
 
 protected:
 	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(VisibleAnywhere)
+	EPorphyState CurrentState = EPorphyState::Approaching;
 
-	UPROPERTY(EditAnywhere, Category = "Burst")
-	float SpinSpeedX = 30.f;
+	UPROPERTY(VisibleAnywhere)
+	UMaterialInstanceDynamic* DynMaterial;
 
-	UPROPERTY(EditAnywhere, Category = "Burst")
-	float SpinSpeedY = 45.f;
+	void Burst(float DeltaTime);
+	void Approaching(float DeltaTime);
+	void Boom();
+	float CountDown = 0.f;
 
-	UPROPERTY(EditAnywhere, Category = "Burst")
-	float SpinSpeedZ = 60.f;
+	float CurrentIntensity = 0.001f;
+
+	UNiagaraSystem* NiagaraEffect;
+
+	virtual void ChildBegin() override;
 };

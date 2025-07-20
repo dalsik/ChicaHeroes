@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "StageManager.h"
-#include "MyGameInstance.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -16,6 +16,12 @@ AStageManager::AStageManager()
 void AStageManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 1. 에셋 경로로 나이아가라 시스템 불러오기
+	NiagaraEffect = LoadObject<UNiagaraSystem>(
+		nullptr,
+		TEXT("/Game/Niagara/NS_Cloud.NS_Cloud")
+	);
 
 	// 3초 후 Stage 시작
 	GetWorldTimerManager().SetTimer(DelayStartHandle, this, &AStageManager::StartFirstStage, 3.0f, false);
@@ -34,14 +40,16 @@ void AStageManager::UnregisterBacteria(ABacteriaBase* Bacteria)
 {
 	if (Bacteria)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Destroyed: %s"), *Bacteria->GetName());
 		RegisteredBacteria.Remove(Bacteria);
 	}
 }
 
-void AStageManager::HandlePlayerAttacked()
+void AStageManager::HandlePlayerAttacked(ABacteriaBase* Attacker)
 {
 	UE_LOG(LogTemp, Warning, TEXT("플레이어가 박테리아에게 공격당함!"));
-	OnPlayerAttackedBP(); // 블루프린트 연출 호출
+	float Damage = Attacker->AttackPower;
+	OnPlayerAttackedBP(Damage); // 블루프린트 연출 호출
 }
 
 // Called every frame
@@ -51,61 +59,45 @@ void AStageManager::Tick(float DeltaTime)
 
 	if (!bStageStarted) return; // 3초 딜레이 전에는 아무것도 안 함
 
-	Time -= DeltaTime;
+	if(!bCleared) Time += DeltaTime;
 
-	if (StageNum == 1 && Time <= 60.f) {
-		StageNum++;
-		SpawnEnemy(Stage2Enemy1, Stage2Enemy1Count, Stage2Enemy2, Stage2Enemy2Count);
+	if (StageNum == 1 && Time > 30.f) {
+		SpawnEnemy();
 	}
-	else if (StageNum == 2 && Time <= 30.f) {
-		StageNum++;
-		SpawnEnemy(Stage3Enemy1, Stage3Enemy1Count, Stage3Enemy2, Stage3Enemy2Count);
+	else if (StageNum == 2 && Time > 60.f) {
+		SpawnEnemy();
 	}
 
-	if (Time < 0) {
+	if (bAllSpawned && RegisteredBacteria.IsEmpty()) {
+		/*
 		UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance());
 		if (GI) {
 			GI->bStageCleared = true;
 		}
+		*/
+		bCleared = true;
+		GameClear();
 	}
 }
 
 void AStageManager::StartFirstStage()
 {
 	// Stage1 시작 시점에서 Time 초기화 및 스폰
-	Time = 90.f;
+	Time = 0.f;
 	StageNum = 0;
 	bStageStarted = true;
 
-	SpawnEnemy(Stage1Enemy1, Stage1Enemy1Count, Stage1Enemy2, Stage1Enemy2Count);
-	StageNum++;
+	SpawnEnemy();
 }
 
 void AStageManager::SpawnNextEnemy()
 {
-	TSubclassOf<ABacteriaBase> CurrentClass = (SpawnPhase == 1) ? EnemyClass1 : EnemyClass2;
-
-	if (SpawnedCount >= TotalSpawnCount)
-	{
-		GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
-
-		if (SpawnPhase == 1)
-		{
-			// Enemy1 다 소환했으므로 Enemy2 시작
-			SpawnPhase = 2;
-			SpawnedCount = 0;
-			TotalSpawnCount = Count2;
-
-			GetWorld()->GetTimerManager().SetTimer(
-				SpawnTimerHandle, this,
-				&AStageManager::SpawnNextEnemy,
-				0.3f, true
-			);
-		}
-
-		return;
+	int rand = FMath::RandRange(0, 1);
+	TSubclassOf<ABacteriaBase> CurrentClass = Enemy[rand];
+	if (CurrentClass && CurrentClass->FindPropertyByName(FName("CurrentState"))) {
+		if(CurrentClass->FindPropertyByName(FName("ShieldGrantInterval")))
+			if (FMath::RandRange(0, 4) > 0) CurrentClass = Enemy[(rand + 1) % 2];
 	}
-
 	FVector Offset = FMath::VRand() * FMath::FRandRange(0.f, SpawnRadius);
 	FVector SpawnLoc = SpawnOrigin + Offset;
 	FRotator RandomRot = FRotator(
@@ -113,16 +105,34 @@ void AStageManager::SpawnNextEnemy()
 		FMath::FRandRange(0.f, 360.f),
 		FMath::FRandRange(0.f, 360.f)
 	);
-
 	GetWorld()->SpawnActor<ABacteriaBase>(CurrentClass, SpawnLoc, RandomRot);
-	SpawnedCount++;
+	if (NiagaraEffect)
+	{
+		// 2. 원하는 위치에 이펙트 생성
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			NiagaraEffect,
+			SpawnLoc,   // 현재 액터 위치(원하는 위치로 변경 가능)
+			RandomRot
+		);
+	}
+	EnemyCount--;
+
+	if (EnemyCount <= 0)
+	{
+		if (StageNum == 2) bAllSpawned = true;
+		MonsterInfo();
+		GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
+	}
 }
 
-void AStageManager::SpawnEnemy(TSubclassOf<ABacteriaBase> Enemy1, int Enemy1Count, TSubclassOf<ABacteriaBase> Enemy2, int Enemy2Count)
+void AStageManager::SpawnEnemy()
 {
-	SpawnOrigin = GetActorLocation() + FVector(0.f, 0.f, 1300.f);
-	SpawnRadius = 2000.f;
+	StageNum++;
+	SpawnOrigin = GetActorLocation() + FVector(0.f, 0.f, 1400.f);
+	SpawnRadius = 1900.f;
 
+	/*
 	// 스폰 범위 시각화
 	DrawDebugSphere(
 		GetWorld(),
@@ -135,22 +145,20 @@ void AStageManager::SpawnEnemy(TSubclassOf<ABacteriaBase> Enemy1, int Enemy1Coun
 		0,
 		2.f     // Thickness
 	);
+	*/
+	//EnemyClass2 = Enemy2;
+	//Count2 = Enemy2Count;
 
-	EnemyClass1 = Enemy1;
-	Count1 = Enemy1Count;
-	EnemyClass2 = Enemy2;
-	Count2 = Enemy2Count;
-
-	SpawnPhase = 1; // 1단계: Enemy1
-	SpawnedCount = 0;
-	TotalSpawnCount = Count1;
+	//SpawnPhase = 1; // 1단계: Enemy1
+	//TotalSpawnCount = Count1;
 
 	GetWorld()->GetTimerManager().SetTimer(
 		SpawnTimerHandle, this,
 		&AStageManager::SpawnNextEnemy,
-		0.3f, true
+		28.f / EnemyCount, true
 	);
 }
+
 
 void AStageManager::TickDisable()
 {

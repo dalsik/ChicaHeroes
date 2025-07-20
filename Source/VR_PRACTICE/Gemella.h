@@ -27,8 +27,11 @@ public:
 protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
+	virtual void OnDeath() override;
 
 	void GrantShieldsToNearbyBacteria();
+
+	TArray<ABacteriaBase*> BacteriaList;
 
 	UPROPERTY(VisibleAnywhere)
 	EGemellaState CurrentState = EGemellaState::Approaching;
@@ -38,7 +41,11 @@ protected:
 
 	FTimerHandle ShieldGrantTimer;
 	UPROPERTY(EditAnywhere, Category = "Shield")
-	float ShieldGrantInterval = 10.0f;
+	float ShieldGrantInterval = 5.0f;
+
+	// Gemella.h
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UNiagaraSystem* NiagaraEffect;
 
 	FVector RandomMoveTarget;
 };

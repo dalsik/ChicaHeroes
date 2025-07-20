@@ -11,7 +11,7 @@ ATreponema::ATreponema() {
 
     Health = 150.0f;
     AttackRange = 1500.f;
-    MoveSpeed = 300.f;
+    MoveSpeed = 600.f;
     CurMoveSpeed = MoveSpeed;
 }
 
@@ -52,6 +52,8 @@ void ATreponema::HandleAttackState(float DeltaTime)
     {
         FVector RandOffset = UKismetMathLibrary::RandomUnitVector() * 600.f;
         RandomMoveTarget = GetActorLocation() + RandOffset;
+        if (RandomMoveTarget.Z <= CameraComp->GetComponentLocation().Z + 10.f)
+            RandomMoveTarget.Z = CameraComp->GetComponentLocation().Z + FMath::RandRange(10.f, 40.f);
     }
 
     MoveToward(RandomMoveTarget, DeltaTime);
@@ -100,10 +102,9 @@ void ATreponema::FireProjectileAt(FVector Target)
     FRotator SpawnRot = (Target - SpawnLoc).Rotation();
 
     AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLoc, SpawnRot);
-    if (Projectile && Projectile->ProjectileMovement)
+    if (Projectile)
     {
         FVector LaunchDir = (Target - SpawnLoc).GetSafeNormal();
-        Projectile->ProjectileMovement->Velocity = LaunchDir * Projectile->ProjectileMovement->InitialSpeed;
         Projectile->SphereMesh->IgnoreActorWhenMoving(this, true);
     }
 }
