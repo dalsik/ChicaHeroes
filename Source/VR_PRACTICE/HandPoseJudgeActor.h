@@ -7,6 +7,7 @@
 #include "ProgressToothActor.h"
 #include "ProgressRotatingActor.h"
 #include "ProgressRotatingActor2.h"
+#include "ProgressHUDActor.h"
 #include "HandPoseJudgeActor.generated.h"
 
 class USkeletalMeshComponent;
@@ -59,7 +60,12 @@ public:
 
 	UPROPERTY()
 	AProgressRotatingActor2* RotatingActor2;
-	
+
+	UPROPERTY()
+	AProgressHUDActor* ProgressWidget;  // Cast된 UUserWidget 포인터
+
+	UFUNCTION(BlueprintCallable)
+	float getProgress();
 private:
 	USkeletalMeshComponent* VRHandMesh_L = nullptr;
 	USkeletalMeshComponent* VRHandMesh_R = nullptr;

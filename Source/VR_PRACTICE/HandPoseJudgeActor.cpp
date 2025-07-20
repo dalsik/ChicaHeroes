@@ -99,7 +99,6 @@ void AHandPoseJudgeActor::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("🦷 RotatingActor2 할당됨: %s"), *RotatingActor2->GetName());
 		break;
 	}
-
 }
 
 void AHandPoseJudgeActor::Tick(float DeltaTime)
@@ -221,4 +220,9 @@ void AHandPoseJudgeActor::CompareHandsAndUpdateProgress()
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("❌ 손 포즈 불일치 (가까운 손은 있었지만 포즈 미일치)"));
 	}
+}
+
+float AHandPoseJudgeActor::getProgress()
+{
+	return Progress;
 }
