@@ -20,16 +20,17 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void OnDeath() {};
 
-    // 데미지 입는 함수
-    virtual float TakeDamageBac(float DamageAmount);
+    // 예시: BacteriaBase.h
+    UFUNCTION(BlueprintCallable, Category = "Bacteria")
+    virtual void TakeDamageBac();
 
     bool bShieldAnim = false;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shield")
-    float Shield = 0.f;
+    bool Shield = false;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shield")
-    float MaxShield = 50.f;
+    bool bShieldHitRecently = false;
 
     UPROPERTY(BlueprintAssignable)
     FOnPlayerAttacked OnPlayerAttacked;
@@ -38,11 +39,11 @@ public:
     UPROPERTY(EditAnywhere, Category = "Bacteria")
     float AttackPower = 10.f;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bacteria")
     UStaticMeshComponent* ShieldMesh;
 
     float getHealth();
 
-    UNiagaraSystem* NiagaraEffect;
 protected:
     virtual void BeginPlay() override;
     virtual void Destroyed() override;
@@ -85,4 +86,15 @@ protected:
 
     // 플레이어 위치 캐시
     FVector PlayerLocation;
+
+    UPROPERTY(EditAnywhere, Category = "RotateSpeed")
+    float SpinSpeedX = 30.f;
+
+    UPROPERTY(EditAnywhere, Category = "RotateSpeed")
+    float SpinSpeedY = 45.f;
+
+    UPROPERTY(EditAnywhere, Category = "RotateSpeed")
+    float SpinSpeedZ = 60.f;
+
+    virtual void ChildBegin() {};
 };

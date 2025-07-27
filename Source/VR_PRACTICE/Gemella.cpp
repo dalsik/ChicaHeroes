@@ -19,21 +19,6 @@ AGemella::AGemella() {
 void AGemella::BeginPlay()
 {
     Super::BeginPlay();
-
-    PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-    if (PlayerPawn)
-    {
-        CameraComp = PlayerPawn->FindComponentByClass<UCameraComponent>();
-    }
-    AStageManager* StageManager = Cast<AStageManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStageManager::StaticClass()));
-    if (StageManager)
-    {
-        StageManager->RegisterBacteria(this);
-    }
-    NiagaraEffect = LoadObject<UNiagaraSystem>(
-        nullptr,
-        TEXT("/Game/Niagara/NS_Wave.NS_Wave")
-    );
     // 일정 시간마다 보호막 부여 함수 실행
     GetWorld()->GetTimerManager().SetTimer(
         ShieldGrantTimer,
@@ -93,9 +78,9 @@ void AGemella::GrantShieldsToNearbyBacteria()
     for (ABacteriaBase* Bacteria : BacteriaList)
     {
         if (!Bacteria || Bacteria == this) continue;
-        if (Bacteria->Shield <= 0.f && Bacteria->getHealth() > 0) // 보호막이 없을 때만 부여
+        if (!Bacteria->Shield && Bacteria->getHealth() > 0) // 보호막이 없을 때만 부여
         {
-            Bacteria->Shield = Bacteria->MaxShield;
+            Bacteria->Shield = true;
             Bacteria->ShieldMesh->SetVisibility(true);
             UE_LOG(LogTemp, Log, TEXT("[Gemella] %s에게 보호막 부여"), *Bacteria->GetName());
         }

@@ -1,4 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "StageManager.h"
@@ -58,12 +59,12 @@ void AStageManager::Tick(float DeltaTime)
 
 	if (!bStageStarted) return; // 3초 딜레이 전에는 아무것도 안 함
 
-	if(!bCleared) Time -= DeltaTime;
+	if(!bCleared) Time += DeltaTime;
 
-	if (StageNum == 1 && Time <= 60.f) {
+	if (StageNum == 1 && Time > 30.f) {
 		SpawnEnemy();
 	}
-	else if (StageNum == 2 && Time <= 30.f) {
+	else if (StageNum == 2 && Time > 60.f) {
 		SpawnEnemy();
 	}
 
@@ -77,22 +78,12 @@ void AStageManager::Tick(float DeltaTime)
 		bCleared = true;
 		GameClear();
 	}
-	else if(Time <= 0.f) {
-		/*
-		UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance());
-		if (GI) {
-			GI->bStageCleared = false;
-		}
-		*/
-		bCleared = true;
-		TimeOver();
-	}
 }
 
 void AStageManager::StartFirstStage()
 {
 	// Stage1 시작 시점에서 Time 초기화 및 스폰
-	Time = 90.f;
+	Time = 0.f;
 	StageNum = 0;
 	bStageStarted = true;
 
@@ -104,7 +95,8 @@ void AStageManager::SpawnNextEnemy()
 	int rand = FMath::RandRange(0, 1);
 	TSubclassOf<ABacteriaBase> CurrentClass = Enemy[rand];
 	if (CurrentClass && CurrentClass->FindPropertyByName(FName("CurrentState"))) {
-		if (FMath::RandRange(0, 4) > 0) CurrentClass = Enemy[(rand + 1) % 2];
+		if(CurrentClass->FindPropertyByName(FName("ShieldGrantInterval")))
+			if (FMath::RandRange(0, 4) > 0) CurrentClass = Enemy[(rand + 1) % 2];
 	}
 	FVector Offset = FMath::VRand() * FMath::FRandRange(0.f, SpawnRadius);
 	FVector SpawnLoc = SpawnOrigin + Offset;
@@ -128,7 +120,7 @@ void AStageManager::SpawnNextEnemy()
 
 	if (EnemyCount <= 0)
 	{
-		if (StageNum == 2 && SpawnPhase == 2) bAllSpawned = true;
+		if (StageNum == 2) bAllSpawned = true;
 		MonsterInfo();
 		GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
 	}
@@ -140,6 +132,7 @@ void AStageManager::SpawnEnemy()
 	SpawnOrigin = GetActorLocation() + FVector(0.f, 0.f, 1400.f);
 	SpawnRadius = 1900.f;
 
+	/*
 	// 스폰 범위 시각화
 	DrawDebugSphere(
 		GetWorld(),
@@ -152,6 +145,7 @@ void AStageManager::SpawnEnemy()
 		0,
 		2.f     // Thickness
 	);
+	*/
 	//EnemyClass2 = Enemy2;
 	//Count2 = Enemy2Count;
 
