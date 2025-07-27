@@ -1,8 +1,9 @@
-// InteractiveActor.cpp
-
-#include "InteractiveActor.h"
+ï»¿#include "InteractiveActor.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Components/Image.h"
+#include "Components/TextBlock.h"
+#include "Blueprint/UserWidget.h"
 
 AInteractiveActor::AInteractiveActor()
 {
@@ -14,53 +15,70 @@ AInteractiveActor::AInteractiveActor()
     HoverUI = CreateDefaultSubobject<UWidgetComponent>(TEXT("HoverUI"));
     HoverUI->SetupAttachment(SkeletalMesh);
     HoverUI->SetVisibility(false);
+    //HoverUI->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    //HoverUI->SetGenerateOverlapEvents(false);
 }
 
 void AInteractiveActor::BeginPlay()
 {
     Super::BeginPlay();
 
-    FString EnumName = StaticEnum<EStageType>()->GetNameStringByValue((int64)StageType);
-    // Widget Component ÀÌ¸§ º¯°æÇÏ±â
-    if (image_name == EnumName && HoverUI)
+    if (!HoverUI)
     {
-        HoverUI->Rename(*EnumName);
+        UE_LOG(LogTemp, Warning, TEXT("HoverUI is null"));
+        return;
+    }
 
-        UE_LOG(LogTemp, Warning, TEXT("HoverUI : %s"), *EnumName);
+    FString EnumName = StaticEnum<EStageType>()->GetNameStringByValue((int64)StageType);
+    HoverUI->Rename(*EnumName);
+
+    // ðŸ’¡ ìœ„ì ¯ ë‚´ìš© ì´ˆê¸°í™”
+    if (UUserWidget* Widget = Cast<UUserWidget>(HoverUI->GetUserWidgetObject()))
+    {
+        UImage* ImageWidget = Cast<UImage>(Widget->GetWidgetFromName(TEXT("Image_Icons")));
+        UTextBlock* TitleTextWidget = Cast<UTextBlock>(Widget->GetWidgetFromName(TEXT("Title_Text")));
+        UTextBlock* ContentTextWidget = Cast<UTextBlock>(Widget->GetWidgetFromName(TEXT("Content_Text")));
+
+        for (const FStageInfo& Info : StageInfos)
+        {
+            if (Info.StageType == StageType)
+            {
+                if (ImageWidget && Info.Icon)
+                {
+                    FSlateBrush Brush;
+                    Brush.SetResourceObject(Info.Icon);
+                    ImageWidget->SetBrush(Brush);
+                    UE_LOG(LogTemp, Warning, TEXT("ì´ë¯¸ì§€ iconìœ¼ë¡œ ë³€ê²½ ë¨"));
+                }
+
+                if (TitleTextWidget)
+                {
+                    TitleTextWidget->SetText(Info.TitleText);
+                    UE_LOG(LogTemp, Warning, TEXT("íƒ€ì´í‹€ í…ìŠ¤íŠ¸ ë³€ê²½ ë¨"));
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("íƒ€ì´í‹€ í…ìŠ¤íŠ¸ ë³€ê²½ ì•ˆ ë¨"));
+                }
+
+                if (ContentTextWidget)
+                {
+                    ContentTextWidget->SetText(Info.ContentText);
+                    UE_LOG(LogTemp, Warning, TEXT("ì»¨í…íŠ¸ í…ìŠ¤íŠ¸ ë³€ê²½ ë¨"));
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("ì»¨í…íŠ¸ í…ìŠ¤íŠ¸ ë³€ê²½ ì•ˆ ë¨"));
+                }
+
+                break;
+            }
+        }
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("Don't Changed"));
+        UE_LOG(LogTemp, Warning, TEXT("HoverUI í• ë‹¹ ì•ˆ ë¨"));
     }
-
-    //À§Á¬ ÄÄÆ÷³ÍÆ® ÀÌ¸§À» Icons ÀÌ¸§°ú ºñ±³
-
-    FString HoverName = HoverUI->GetName();
-    
-    if (UUserWidget* Widget = Cast<UUserWidget>(HoverUI->GetUserWidgetObject()))
-    {
-        if (UImage* ImageWidget = Cast<UImage>(Widget->GetWidgetFromName(TEXT("Image_Icons"))))
-        {
-            for (UTexture2D* IconTex : Icons)
-            {
-                if (!IconTex) continue;
-
-                FString TexName = IconTex->GetName();
-                
-                if (TexName.Equals(HoverName, ESearchCase::IgnoreCase))
-                {
-                    FSlateBrush Brush;
-                    Brush.SetResourceObject(IconTex);
-                    ImageWidget->SetBrush(Brush);
-
-                    UE_LOG(LogTemp, Warning, TEXT("Set Image : %s"), *TexName);
-                    break;
-                }
-            }
-        }
-        else UE_LOG(LogTemp, Warning, TEXT("ImageWidget!~!~!~"));
-    }
-    else UE_LOG(LogTemp, Warning, TEXT("UserWidget!!~!~!"));
 }
 
 void AInteractiveActor::Tick(float DeltaTime)
@@ -68,17 +86,16 @@ void AInteractiveActor::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 }
 
-
 void AInteractiveActor::ShowHoverUI(bool bShow)
 {
-    if (HoverUI)
+    if (!HoverUI)
     {
-        HoverUI->SetVisibility(bShow);
+        UE_LOG(LogTemp, Warning, TEXT("HoverUI is null"));
+        return;
     }
+
+    HoverUI->SetVisibility(bShow);
+    UE_LOG(LogTemp, Warning, TEXT("ShowHoverUI: %s"), bShow ? TEXT("true") : TEXT("false"));
 }
 
-void AInteractiveActor::PerformInteraction()
-{
-    UE_LOG(LogTemp, Log, TEXT("Performing Interaction!"));
-    // ¿øÇÏ´Â Çàµ¿ ±¸Çö
-}
+

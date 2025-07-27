@@ -1,12 +1,14 @@
-// InteractiveActor.h
+ï»¿// InteractiveActor.h
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Components/TextBlock.h"
 #include "Components/Image.h"
 
+#include "InteractiveActor.generated.h"
 UENUM(BlueprintType)
 enum class EStageType : uint8
 {
@@ -16,7 +18,24 @@ enum class EStageType : uint8
     Scaling UMETA(DisplayName = "Scaling")
 };
 
-#include "InteractiveActor.generated.h"
+USTRUCT(BlueprintType)
+struct FStageInfo
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    EStageType StageType;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UTexture2D* Icon;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FText TitleText;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FText ContentText;
+};
+
 
 class USkeletalMeshComponent;
 class UWidgetComponent;
@@ -36,24 +55,18 @@ protected:
 public:
     virtual void Tick(float DeltaTime) override;
 
-    // Hover UI¸¦ ÄÑ°í ²ô´Â ÇÔ¼ö
+    // Hover UIï¿½ï¿½ ï¿½Ñ°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
     UFUNCTION(BlueprintCallable)
     void ShowHoverUI(bool bShow);
-
-    // Æ®¸®°Å »óÈ£ÀÛ¿ë ÇÔ¼ö
-    UFUNCTION(BlueprintCallable)
-    void PerformInteraction();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stage")
     EStageType StageType;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "image_name")
-    FString image_name;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "image_name")
-    TArray<UTexture2D*> Icons;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stage Info")
+    TArray<FStageInfo> StageInfos;
 
-       
+
 protected:
     UPROPERTY(VisibleAnywhere)
     USkeletalMeshComponent* SkeletalMesh;
