@@ -36,6 +36,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stage")
 	int EnemyCount;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<AActor*> SpawnSphere;
+
 	UPROPERTY(BlueprintReadOnly)
 	TArray<ABacteriaBase*> RegisteredBacteria;
 
@@ -63,9 +66,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Stage")
 	void TickDisable();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	APostProcessVolume* TargetPostProcessVolume;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	APawn* PlayerPawn;
