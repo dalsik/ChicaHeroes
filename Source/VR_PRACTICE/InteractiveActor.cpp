@@ -17,6 +17,8 @@ AInteractiveActor::AInteractiveActor()
     HoverUI->SetVisibility(false);
     //HoverUI->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     //HoverUI->SetGenerateOverlapEvents(false);
+    HoverUI->SetTwoSided(true);
+    HoverUI->SetBlendMode(EWidgetBlendMode::Transparent);   // 투명도 허용
 }
 
 void AInteractiveActor::BeginPlay()
