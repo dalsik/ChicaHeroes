@@ -11,22 +11,19 @@ APrevo::APrevo() {
 
     SplitBacteriaClass = APrevo::StaticClass();
     Health = InitialHealth;
-    MoveSpeed = 100.0f;
+    MoveSpeed = 200.0f;
     AttackPower = InitialAttackPower;
 
     UE_LOG(LogTemp, Warning, TEXT("Prevo Spawn"));
 }
 
-void APrevo::Tick(float DeltaTime)
+void APrevo::performBehavior(float DeltaTime)
 {
-    Super::Tick(DeltaTime);
-
-    //전방위 회전 (X, Y, Z축으로 천천히)
+//전방위 회전 (X, Y, Z축으로 천천히)
     FRotator SpinRotation = FRotator(SpinSpeedX * DeltaTime, SpinSpeedY * DeltaTime, SpinSpeedZ * DeltaTime);
     AddActorLocalRotation(SpinRotation);
 
     if (!PlayerPawn || !CameraComp) return;
-    if (MaxSpeed > MoveSpeed) MoveSpeed += IncSpeed;
 
     //테스트용 삭제 필요
     //TakeDamageBac(0.2f);
@@ -76,7 +73,6 @@ void APrevo::OnDeath()
         Split();
     }
 }
-
 
 void APrevo::Split()
 {

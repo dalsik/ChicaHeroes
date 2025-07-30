@@ -25,16 +25,16 @@ public:
 	AGemella();
 
 protected:
-	virtual void Tick(float DeltaTime) override;
-	virtual void BeginPlay() override;
 	virtual void OnDeath() override;
+
+	virtual void performBehavior(float DeltaTime) override;
 
 	void GrantShieldsToNearbyBacteria();
 
 	TArray<ABacteriaBase*> BacteriaList;
 
 	UPROPERTY(VisibleAnywhere)
-	EGemellaState CurrentState = EGemellaState::Approaching;
+	EGemellaState SubState = EGemellaState::Approaching;
 
 	void HandleAttackState(float DeltaTime);
 	void MoveToward(FVector TargetLocation, float DeltaTime);
@@ -48,4 +48,6 @@ protected:
 	UNiagaraSystem* NiagaraEffect;
 
 	FVector RandomMoveTarget;
+
+	virtual void ChildBegin() override;
 };

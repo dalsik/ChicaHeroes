@@ -25,9 +25,9 @@ public:
 	APorphy();
 
 protected:
-	virtual void Tick(float DeltaTime) override;
+	virtual void performBehavior(float DeltaTime) override;
 	UPROPERTY(VisibleAnywhere)
-	EPorphyState CurrentState = EPorphyState::Approaching;
+	EPorphyState SubState = EPorphyState::Approaching;
 
 	UPROPERTY(VisibleAnywhere)
 	UMaterialInstanceDynamic* DynMaterial;

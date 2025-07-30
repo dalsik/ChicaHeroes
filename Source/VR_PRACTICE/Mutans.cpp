@@ -9,16 +9,12 @@ AMutans::AMutans() {
     PrimaryActorTick.bCanEverTick = true;
 
     Health = 500.0f;
-    MaxSpeed = 500.0f;
-    MoveSpeed = 0.f;
+    MoveSpeed = 500.f;
 }
 
-void AMutans::Tick(float DeltaTime)
+void AMutans::performBehavior(float DeltaTime)
 {
-    Super::Tick(DeltaTime);
-
     if (!PlayerPawn || !CameraComp) return;
-    if (MaxSpeed > MoveSpeed) MoveSpeed += IncSpeed;
 
     // 1. 플레이어 방향 벡터
     FVector ToPlayer = CameraComp->GetComponentLocation() - GetActorLocation();

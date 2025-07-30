@@ -19,7 +19,7 @@ public:
 
 protected:
     virtual void OnDeath() override;
-	virtual void Tick(float DeltaTime) override;
+    virtual void performBehavior(float DeltaTime) override;
 
     void Split();
 

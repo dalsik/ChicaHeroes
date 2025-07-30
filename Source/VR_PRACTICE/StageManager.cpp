@@ -17,6 +17,7 @@ void AStageManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+
 	// 1. 에셋 경로로 나이아가라 시스템 불러오기
 	NiagaraEffect = LoadObject<UNiagaraSystem>(
 		nullptr,
@@ -98,14 +99,21 @@ void AStageManager::SpawnNextEnemy()
 		if(CurrentClass->FindPropertyByName(FName("ShieldGrantInterval")))
 			if (FMath::RandRange(0, 4) > 0) CurrentClass = Enemy[(rand + 1) % 2];
 	}
-	FVector Offset = FMath::VRand() * FMath::FRandRange(0.f, SpawnRadius);
-	FVector SpawnLoc = SpawnOrigin + Offset;
-	FRotator RandomRot = FRotator(
-		FMath::FRandRange(0.f, 360.f),
-		FMath::FRandRange(0.f, 360.f),
-		FMath::FRandRange(0.f, 360.f)
-	);
-	GetWorld()->SpawnActor<ABacteriaBase>(CurrentClass, SpawnLoc, RandomRot);
+	FVector2D Rand2D = FMath::RandPointInCircle(SpawnRadius);
+	FVector Offset(Rand2D.X, Rand2D.Y, 0.f);
+	FVector SpawnLoc = SpawnPoint[FMath::RandRange(0, SpawnPointNum)] + Offset;
+	FRotator RandomRot = FRotator(0, 0, 0);
+	ABacteriaBase* SpawnedBacteria = GetWorld()->SpawnActorDeferred<ABacteriaBase>(
+		CurrentClass,
+		FTransform(RandomRot, SpawnLoc),
+		this,
+		nullptr,
+		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
+		);
+	if (SpawnedBacteria) {
+		SpawnedBacteria->Init(PlayerPawn, UptoDownRate, DownToUpRate, Force, XRangeMin, XRangeMax, YRangeMin, YRangeMax);
+		UGameplayStatics::FinishSpawningActor(SpawnedBacteria, FTransform(RandomRot, SpawnLoc));
+	}
 	if (NiagaraEffect)
 	{
 		// 2. 원하는 위치에 이펙트 생성
@@ -130,9 +138,8 @@ void AStageManager::SpawnEnemy()
 {
 	StageNum++;
 	SpawnOrigin = GetActorLocation() + FVector(0.f, 0.f, 1400.f);
-	SpawnRadius = 1900.f;
 
-	
+	/*
 	// 스폰 범위 시각화
 	DrawDebugSphere(
 		GetWorld(),
@@ -145,7 +152,7 @@ void AStageManager::SpawnEnemy()
 		0,
 		2.f     // Thickness
 	);
-	
+	*/
 	//EnemyClass2 = Enemy2;
 	//Count2 = Enemy2Count;
 
