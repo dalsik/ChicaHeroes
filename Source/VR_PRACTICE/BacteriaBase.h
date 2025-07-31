@@ -27,16 +27,21 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void OnDeath() {};
 
-    // ¿¹½Ã: BacteriaBase.h
     UFUNCTION(BlueprintCallable, Category = "Bacteria")
-    virtual void TakeDamageBac();
+    virtual void TakeDamageBac(float Damage);
+
+    UFUNCTION(BlueprintCallable, Category = "Bacteria")
+    virtual void HitBac(AActor* Actor);
 
     bool bShieldAnim = false;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shield")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit")
+    bool PistolOverlap = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit")
     bool Shield = false;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shield")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit")
     bool bShieldHitRecently = false;
 
     UPROPERTY(BlueprintAssignable)

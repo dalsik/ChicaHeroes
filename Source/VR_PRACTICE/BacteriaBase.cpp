@@ -65,13 +65,47 @@ void ABacteriaBase::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
     if (CurrentState == EBacteriaState::CustomBehavior) {
         performBehavior(DeltaTime);
+        if (PistolOverlap) TakeDamageBac(0.5f);
     }
 }
 
-void ABacteriaBase::TakeDamageBac()
+void ABacteriaBase::HitBac(AActor* Actor)
 {
-    OnDeath();
-    Destroy();
+    float HitDamage = 0;
+    if (Actor->ActorHasTag("Bullet")) {
+        if (Actor->Tags.Contains("Bullet0")) HitDamage = 5.f;
+        else if (Actor->Tags.Contains("Bullet1")) HitDamage = 7.f;
+        else if (Actor->Tags.Contains("Bullet2")) HitDamage = 1.f;
+        Actor->Destroy();
+    }
+    else if (Actor->ActorHasTag("Pistol")) {
+        PistolOverlap = true;
+    }
+    else return;
+    
+    if (bShieldHitRecently) return;
+    TakeDamageBac(HitDamage);
+}
+
+void ABacteriaBase::TakeDamageBac(float HitDamage)
+{
+    if (bShieldHitRecently) return;
+    if (Shield) {
+        Shield = false;
+        bShieldHitRecently = true;
+        ShieldMesh->SetHiddenInGame(true);
+        GetWorldTimerManager().SetTimerForNextTick([this]()
+            {
+                bShieldHitRecently = false;
+            });
+    }
+    else {
+        Health -= 10.f;
+        if (Health <= 0.f) {
+            OnDeath();
+            Destroy();
+        }
+    }
 }
 
 void ABacteriaBase::Destroyed()
