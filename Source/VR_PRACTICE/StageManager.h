@@ -70,6 +70,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Stage")
 	void TickDisable();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stage")
+	bool Start = true;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	APawn* PlayerPawn;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")

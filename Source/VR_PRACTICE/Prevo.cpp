@@ -92,6 +92,7 @@ void APrevo::Split()
 
         if (NewClone)
         {
+            NewClone->Init(PlayerPawn, UptoDownRate = 0.f, DownToUpRate = 0.f, Force = 0.f, XRangeMin = 0.f, XRangeMax = 0.f, YRangeMin = 0.f, YRangeMax = 0.f);
             NewClone->bIsSpawning = true;
             NewClone->SpreadElapsedTime = 0.f;
             NewClone->InitialLocation = SpawnLocation;

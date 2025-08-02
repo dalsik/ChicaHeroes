@@ -25,7 +25,7 @@ void AStageManager::BeginPlay()
 	);
 
 	// 3초 후 Stage 시작
-	GetWorldTimerManager().SetTimer(DelayStartHandle, this, &AStageManager::StartFirstStage, 3.0f, false);
+	if(Start) GetWorldTimerManager().SetTimer(DelayStartHandle, this, &AStageManager::StartFirstStage, 3.0f, false);
 }
 
 void AStageManager::RegisterBacteria(ABacteriaBase* Bacteria)

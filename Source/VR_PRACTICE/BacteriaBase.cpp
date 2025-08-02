@@ -65,17 +65,20 @@ void ABacteriaBase::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
     if (CurrentState == EBacteriaState::CustomBehavior) {
         performBehavior(DeltaTime);
-        if (PistolOverlap) TakeDamageBac(0.5f);
+        if (PistolOverlap) TakeDamageBac(1.f);
     }
 }
 
 void ABacteriaBase::HitBac(AActor* Actor)
 {
-    float HitDamage = 0;
-    if (Actor->ActorHasTag("Bullet")) {
-        if (Actor->Tags.Contains("Bullet0")) HitDamage = 5.f;
-        else if (Actor->Tags.Contains("Bullet1")) HitDamage = 7.f;
-        else if (Actor->Tags.Contains("Bullet2")) HitDamage = 1.f;
+    float HitDamage = 0.f;
+    if (Actor->Tags.Contains("Bullet0")) {
+        HitDamage = 10.f;
+        Actor->Destroy();
+    }
+    else if (Actor->Tags.Contains("Bullet1")) HitDamage = 20.f;
+    else if (Actor->Tags.Contains("Bullet2")) {
+        HitDamage = 3.f;
         Actor->Destroy();
     }
     else if (Actor->ActorHasTag("Pistol")) {
@@ -100,7 +103,8 @@ void ABacteriaBase::TakeDamageBac(float HitDamage)
             });
     }
     else {
-        Health -= 10.f;
+        Health -= HitDamage;
+        UE_LOG(LogTemp, Warning, TEXT("Health: %f"), Health);
         if (Health <= 0.f) {
             OnDeath();
             Destroy();
