@@ -18,5 +18,5 @@ public:
 	AMutans();
 
 protected:
-	virtual void Tick(float DeltaTime) override;
+	virtual void performBehavior(float DeltaTime) override;
 };

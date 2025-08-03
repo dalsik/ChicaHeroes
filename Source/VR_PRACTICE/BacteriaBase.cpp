@@ -21,6 +21,9 @@ ABacteriaBase::ABacteriaBase()
 
     MeshComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore); // 서로 무시
 
+    MeshComponent->SetEnableGravity(false);
+    MeshComponent->SetSimulatePhysics(true);
+
     ShieldMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShieldMesh"));
     ShieldMesh->SetupAttachment(RootComponent);
 
@@ -43,11 +46,6 @@ void ABacteriaBase::BeginPlay()
 {
     Super::BeginPlay();
 
-    PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-    if (PlayerPawn)
-    {
-        CameraComp = PlayerPawn->FindComponentByClass<UCameraComponent>();
-    }
     AStageManager* StageManager = Cast<AStageManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStageManager::StaticClass()));
     if (StageManager)
     {
@@ -58,22 +56,60 @@ void ABacteriaBase::BeginPlay()
     ShieldMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision); // 충돌 X
     ShieldMesh->SetWorldScale3D(GetActorScale3D() * 2.f); // 본체보다 조금 크게
 
+    LaunchBounce();
     ChildBegin();
 }
 
 void ABacteriaBase::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
-    if (CameraComp) {
-        PlayerLocation = CameraComp->GetComponentLocation();
+    if (CurrentState == EBacteriaState::CustomBehavior) {
+        performBehavior(DeltaTime);
+        if (PistolOverlap) TakeDamageBac(1.f);
     }
 }
 
-void ABacteriaBase::TakeDamageBac()
+void ABacteriaBase::HitBac(AActor* Actor)
 {
-    OnDeath();
-    Destroy();
+    float HitDamage = 0.f;
+    if (Actor->Tags.Contains("Bullet0")) {
+        HitDamage = 10.f;
+        Actor->Destroy();
+    }
+    else if (Actor->Tags.Contains("Bullet1")) HitDamage = 20.f;
+    else if (Actor->Tags.Contains("Bullet2")) {
+        HitDamage = 3.f;
+        Actor->Destroy();
+    }
+    else if (Actor->ActorHasTag("Pistol")) {
+        PistolOverlap = true;
+    }
+    else return;
+    
+    if (bShieldHitRecently) return;
+    TakeDamageBac(HitDamage);
+}
+
+void ABacteriaBase::TakeDamageBac(float HitDamage)
+{
+    if (bShieldHitRecently) return;
+    if (Shield) {
+        Shield = false;
+        bShieldHitRecently = true;
+        ShieldMesh->SetHiddenInGame(true);
+        GetWorldTimerManager().SetTimerForNextTick([this]()
+            {
+                bShieldHitRecently = false;
+            });
+    }
+    else {
+        Health -= HitDamage;
+        UE_LOG(LogTemp, Warning, TEXT("Health: %f"), Health);
+        if (Health <= 0.f) {
+            OnDeath();
+            Destroy();
+        }
+    }
 }
 
 void ABacteriaBase::Destroyed()
@@ -85,4 +121,49 @@ void ABacteriaBase::Destroyed()
     {
         StageManager->UnregisterBacteria(this);
     }
+}
+
+void ABacteriaBase::performBehavior(float DeltaTime)
+{
+    if (CameraComp) {
+        PlayerLocation = CameraComp->GetComponentLocation();
+    }
+}
+
+void ABacteriaBase::LaunchBounce()
+{
+    float X = FMath::FRandRange(XRangeMin, XRangeMax);
+    float Y = FMath::FRandRange(YRangeMin, YRangeMax);
+
+    FVector BounceDir;
+    if (GetActorLocation().Z > 0.0f) {
+        BounceDir = FVector(X, Y, UptoDownRate);
+        SetActorRotation(FRotator(-180.f, 0, 0));
+    }
+    else {
+        BounceDir = FVector(X, Y, DownToUpRate);
+    }
+    MeshComponent->AddImpulse(BounceDir * Force, NAME_None, true);
+
+    GetWorldTimerManager().SetTimerForNextTick([this]()
+        {
+            CurrentState = EBacteriaState::CustomBehavior;
+        });
+}
+
+void ABacteriaBase::Init(APawn* InPlayer, float InUptoDownRate, float InDownToUpRate, float InForce, float InXRangeMin, float InXRangeMax, float InYRangeMin, float InYRangeMax)
+{
+    PlayerPawn = InPlayer;
+    if (PlayerPawn)
+    {
+        CameraComp = PlayerPawn->FindComponentByClass<UCameraComponent>();
+    }
+
+    this->UptoDownRate = InUptoDownRate;
+    this->DownToUpRate = InDownToUpRate;
+    this->Force = InForce;
+    this->XRangeMin = InXRangeMin;
+    this->XRangeMax = InXRangeMax;
+    this->YRangeMin = InYRangeMin;
+    this->YRangeMax = InYRangeMax;
 }

@@ -14,10 +14,7 @@ ATreponema::ATreponema() {
     MoveSpeed = 600.f;
     CurMoveSpeed = MoveSpeed;
 }
-
-void ATreponema::Tick(float DeltaTime) {
-    Super::Tick(DeltaTime);
-
+void ATreponema::performBehavior(float DeltaTime) {
     if (!PlayerPawn || !CameraComp) return;
 
     FVector ToPlayer = PlayerPawn->GetActorLocation() - GetActorLocation();
@@ -25,15 +22,15 @@ void ATreponema::Tick(float DeltaTime) {
     if (CurMoveSpeed <= 0.f) {
         if (Distance > AttackRange)
         {
-            CurrentState = ETreponemaState::Approaching;
+            SubState = ETreponemaState::Approaching;
         }
         else
         {
-            CurrentState = ETreponemaState::Attacking;
+            SubState = ETreponemaState::Attacking;
         }
     }
 
-    switch (CurrentState)
+    switch (SubState)
     {
     case ETreponemaState::Approaching:
         MoveToward(CameraComp->GetComponentLocation(), DeltaTime);
