@@ -44,7 +44,7 @@ public:
 	float RotationTolerance = 30.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Progress")
-	float Progress = 10.0f;
+	float Progress = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Matching Settings")
 	float MatchingDistanceThreshold = 20.f; // 손 전체 위치 차이 허용
