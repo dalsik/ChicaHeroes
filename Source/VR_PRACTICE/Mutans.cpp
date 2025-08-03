@@ -12,6 +12,8 @@ AMutans::AMutans() {
     MoveSpeed = 500.f;
 
     Point = 30;
+
+    Impulse = 500.f / 700.f;
 }
 
 void AMutans::performBehavior(float DeltaTime)
