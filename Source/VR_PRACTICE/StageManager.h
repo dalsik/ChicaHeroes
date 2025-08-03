@@ -36,9 +36,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stage")
 	TArray<TSubclassOf<ABacteriaBase>> Enemy;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stage")
-	int EnemyCount;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<FVector> SpawnPoint;
 
