@@ -17,13 +17,6 @@ void AStageManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-
-	// 1. 에셋 경로로 나이아가라 시스템 불러오기
-	NiagaraEffect = LoadObject<UNiagaraSystem>(
-		nullptr,
-		TEXT("/Game/Niagara/NS_Cloud.NS_Cloud")
-	);
-
 	// 3초 후 Stage 시작
 	if(Start) GetWorldTimerManager().SetTimer(DelayStartHandle, this, &AStageManager::StartFirstStage, 3.0f, false);
 }
@@ -117,11 +110,14 @@ void AStageManager::SpawnNextEnemy()
 	if (NiagaraEffect)
 	{
 		// 2. 원하는 위치에 이펙트 생성
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			GetWorld(),
-			NiagaraEffect,
-			SpawnLoc,   // 현재 액터 위치(원하는 위치로 변경 가능)
-			RandomRot
+		UNiagaraFunctionLibrary::SpawnSystemAttached(
+			NiagaraEffect,             // 나이아가라 시스템
+			SpawnedBacteria->GetRootComponent(),             // 어태치할 컴포넌트 (ex: RootComponent)
+			NAME_None,                 // 소켓 이름 (없으면 NAME_None)
+			FVector::ZeroVector,       // 위치 오프셋
+			FRotator::ZeroRotator,     // 회전 오프셋
+			EAttachLocation::KeepRelativeOffset, // 어태치 방식
+			true                       // 파괴 시 자동 삭제 여부
 		);
 	}
 	EnemyCount--;

@@ -30,6 +30,9 @@ public:
 	void RegisterBacteria(ABacteriaBase* Bacteria);
 	void UnregisterBacteria(ABacteriaBase* Bacteria);
 
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* NiagaraEffect;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stage")
 	TArray<TSubclassOf<ABacteriaBase>> Enemy;
 
@@ -109,7 +112,6 @@ public:
 	int StageNum = 0;
 
 private:
-	UNiagaraSystem* NiagaraEffect;
 
 	FTimerHandle SpawnTimerHandle;
 	FTimerHandle DelayStartHandle;

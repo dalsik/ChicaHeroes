@@ -13,6 +13,8 @@ AGemella::AGemella() {
     Health = 150.0f;
     MoveSpeed = 300.f;
     AttackRange = 1500.f;
+
+    Point = 5;
 }
 
 void AGemella::ChildBegin()

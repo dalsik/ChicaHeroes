@@ -14,6 +14,8 @@ APrevo::APrevo() {
     MoveSpeed = 200.0f;
     AttackPower = InitialAttackPower;
 
+    Point = 50;
+
     UE_LOG(LogTemp, Warning, TEXT("Prevo Spawn"));
 }
 

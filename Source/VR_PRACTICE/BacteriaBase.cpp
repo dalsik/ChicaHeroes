@@ -65,7 +65,15 @@ void ABacteriaBase::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
     if (CurrentState == EBacteriaState::CustomBehavior) {
         performBehavior(DeltaTime);
-        if (PistolOverlap) TakeDamageBac(1.f);
+        if (PistolOverlap)
+        {
+            GetWorld()->GetTimerManager().SetTimer(
+                SpawnTimerHandle, this,
+                &ABacteriaBase::TakeDamageBacPistol,
+                0.1f, true
+            );
+            PistolOverlap = false;
+        }
     }
 }
 
@@ -104,6 +112,28 @@ void ABacteriaBase::TakeDamageBac(float HitDamage)
     }
     else {
         Health -= HitDamage;
+        UE_LOG(LogTemp, Warning, TEXT("Health: %f"), Health);
+        if (Health <= 0.f) {
+            OnDeath();
+            Destroy();
+        }
+    }
+}
+
+void ABacteriaBase::TakeDamageBacPistol()
+{
+    if (bShieldHitRecently) return;
+    if (Shield) {
+        Shield = false;
+        bShieldHitRecently = true;
+        ShieldMesh->SetHiddenInGame(true);
+        GetWorldTimerManager().SetTimerForNextTick([this]()
+            {
+                bShieldHitRecently = false;
+            });
+    }
+    else {
+        Health -= 1.f;
         UE_LOG(LogTemp, Warning, TEXT("Health: %f"), Health);
         if (Health <= 0.f) {
             OnDeath();

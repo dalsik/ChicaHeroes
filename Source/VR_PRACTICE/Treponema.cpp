@@ -13,7 +13,10 @@ ATreponema::ATreponema() {
     AttackRange = 1500.f;
     MoveSpeed = 600.f;
     CurMoveSpeed = MoveSpeed;
+
+    Point = 50;
 }
+
 void ATreponema::performBehavior(float DeltaTime) {
     if (!PlayerPawn || !CameraComp) return;
 

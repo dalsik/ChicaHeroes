@@ -31,6 +31,9 @@ public:
     virtual void TakeDamageBac(float Damage);
 
     UFUNCTION(BlueprintCallable, Category = "Bacteria")
+    virtual void TakeDamageBacPistol();
+
+    UFUNCTION(BlueprintCallable, Category = "Bacteria")
     virtual void HitBac(AActor* Actor);
 
     bool bShieldAnim = false;
@@ -57,6 +60,13 @@ public:
     float getHealth();
 
     void Init(APawn* InPlayer, float UptoDownRate, float DownToUpRate, float Force, float XRangeMin, float XRangeMax, float YRangeMin, float YRangeMax);
+
+    // 플레이어 참조
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bacteria")
+    APawn* PlayerPawn;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bacteria")
+    int Point = 10;
 
 protected:
     EBacteriaState CurrentState = EBacteriaState::Bounced;
@@ -93,10 +103,6 @@ protected:
     UPROPERTY(VisibleAnywhere, Category = "Bacteria")
     UStaticMeshComponent* MeshComponent;
 
-    // 플레이어 참조
-    UPROPERTY(EditAnywhere, Category = "Bacteria")
-    APawn* PlayerPawn;
-
     UPROPERTY(VisibleAnywhere, Category = "Bacteria")
     float Distance;
 
@@ -117,6 +123,8 @@ protected:
     float SpinSpeedZ = 60.f;
 
     virtual void ChildBegin() {};
+
+    FTimerHandle SpawnTimerHandle;
 
     float UptoDownRate = 0.f;
     float DownToUpRate = 0.f;

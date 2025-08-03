@@ -10,6 +10,8 @@ AMutans::AMutans() {
 
     Health = 500.0f;
     MoveSpeed = 500.f;
+
+    Point = 30;
 }
 
 void AMutans::performBehavior(float DeltaTime)

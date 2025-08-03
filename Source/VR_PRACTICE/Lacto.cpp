@@ -10,6 +10,8 @@ ALacto::ALacto() {
 
     Health = 150.0f;
     MoveSpeed = 700.f;
+
+    Point = 30;
 }
 
 void ALacto::performBehavior(float DeltaTime)

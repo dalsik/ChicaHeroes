@@ -12,6 +12,7 @@ APorphy::APorphy() {
     MoveSpeed = 250.0f;
     AttackRange = 500.f;
 
+    Point = 50;
     NiagaraEffect = LoadObject<UNiagaraSystem>(
         nullptr,
         TEXT("/Game/Niagara/NS_LowPolyExplosion.NS_LowPolyExplosion")
