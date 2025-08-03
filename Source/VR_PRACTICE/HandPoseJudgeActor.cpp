@@ -177,8 +177,8 @@ void AHandPoseJudgeActor::CompareHandsAndUpdateProgress()
 			if (MatchedCount >= 4)
 			{
 				bAnyMatch = true;
-				Progress += 5.0f;
-				//UE_LOG(LogTemp, Warning, TEXT("🎉 [%s] 손 포즈 일치! 진행도: %.2f"), *Hand.Label, Progress);
+				
+				
 
 				// 손 매칭 진행도 전달
 				if (ToothProgressActor)
@@ -200,12 +200,23 @@ void AHandPoseJudgeActor::CompareHandsAndUpdateProgress()
 				// ✅ 파티클 이펙트 생성
 				if (MatchingEffect)
 				{
+					Progress += 5.0f;
 					UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 						GetWorld(),
 						MatchingEffect,
 						SpawnedMesh->GetComponentLocation(),
 						FRotator::ZeroRotator
 					);
+
+					static ConstructorHelpers::FObjectFinder<USoundBase>MatchingSoundAsset(TEXT("/All/Game/TeethPull_Correct"));
+					if (MatchingSoundAsset.Succeeded())
+					{
+						UGameplayStatics::PlaySoundAtLocation(
+							GetWorld(),
+							MatchingSoundAsset.Object,
+							SpawnedMesh->GetComponentLocation()
+						);
+					}
 				}
 
 				Tooth.Actor->Destroy();
