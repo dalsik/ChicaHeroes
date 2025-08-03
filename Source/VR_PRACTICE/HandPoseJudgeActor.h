@@ -52,6 +52,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	UNiagaraSystem* MatchingEffect;
 
+	UPROPERTY(EditAnywhere, Category = "Sound");
+	USoundBase* MatchingSound;
+
 	UPROPERTY()
 	AProgressToothActor* ToothProgressActor;
 	
