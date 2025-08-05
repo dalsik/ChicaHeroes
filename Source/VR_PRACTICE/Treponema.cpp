@@ -5,6 +5,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Projectile.h"
+#include <Kismet/GameplayStatics.h>
 
 ATreponema::ATreponema() {
     ProjectileClass = AProjectile::StaticClass();
@@ -101,10 +102,18 @@ void ATreponema::FireProjectileAt(FVector Target)
     FVector SpawnLoc = GetActorLocation() + FVector(0, 0, 0); // 약간 위에서
     FRotator SpawnRot = (Target - SpawnLoc).Rotation();
 
-    AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLoc, SpawnRot);
+    AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
+        ProjectileClass,
+        FTransform(SpawnRot, SpawnLoc),
+        this,
+        nullptr,
+        ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
+    );
     if (Projectile)
     {
+        Projectile->Init(PlayerPawn, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
         FVector LaunchDir = (Target - SpawnLoc).GetSafeNormal();
         Projectile->SphereMesh->IgnoreActorWhenMoving(this, true);
+        UGameplayStatics::FinishSpawningActor(Projectile, FTransform(SpawnRot, SpawnLoc));
     }
 }

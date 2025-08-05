@@ -124,6 +124,21 @@ void AStageManager::SpawnNextEnemy()
 	}
 }
 
+void AStageManager::PickEnemyInfo()
+{
+	FEnemyInfo* EnemyInfo = nullptr;
+	if (EnemyDataTable) {
+		TArray<FName> RowNames = EnemyDataTable->GetRowNames();
+		if (RowNames.Num() > 0) {
+			int32 RandomIndex = FMath::RandRange(0, RowNames.Num() - 1);
+			FName RandomRowName = RowNames[RandomIndex];
+			EnemyInfo = EnemyDataTable->FindRow<FEnemyInfo>(RandomRowName, TEXT(""));
+		}
+	}
+	for (int i = 0; i < EnemyInfo->Enemy1Count; i++) Enemy.Add(EnemyInfo->Enemy1);
+	for (int i = 0; i < EnemyInfo->Enemy2Count; i++) Enemy.Add(EnemyInfo->Enemy2);
+}
+
 void AStageManager::SpawnEnemy()
 {
 	StageNum++;
