@@ -5,6 +5,7 @@ Intermediate/
 Saved/
 .vs/
 .vscode/
+.sln/
 
 # Build system
 *.pdb
