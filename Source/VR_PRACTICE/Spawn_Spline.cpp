@@ -20,8 +20,10 @@ void ASpawn_Spline::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ⭐ 첫 메시 즉시 Spawn
-	SpawnHand();
+	GetWorldTimerManager().SetTimer(SpawnDelayTimer, [this]()
+		{
+			bCanSpawn = true; // 10초 뒤 스폰 활성화
+		}, 10.0f, false);
 
 	// 초기화
 	SpawnTimer = 0.0f;
@@ -31,6 +33,7 @@ void ASpawn_Spline::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!bCanSpawn) return;
 	SpawnTimer += DeltaTime;
 	if (SpawnTimer >= SpawnInterval)
 	{
@@ -40,7 +43,7 @@ void ASpawn_Spline::Tick(float DeltaTime)
 
 	for (FMovingTooth& Tooth : SpawnedTeeth)
 	{
-		if (!Tooth.Actor) continue;
+		//if (!Tooth.Actor) continue;
 
 		Tooth.ElapsedTime += DeltaTime;
 		float Distance = Tooth.ElapsedTime * MoveSpeed;
