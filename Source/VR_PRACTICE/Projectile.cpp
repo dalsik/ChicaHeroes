@@ -35,6 +35,14 @@ AProjectile::AProjectile()
     ProjectileMovement->bShouldBounce = false;
     ProjectileMovement->ProjectileGravityScale = 0.0f;
     */
+    UptoDownRate = 0.f;
+    DownToUpRate = 0.f; 
+    Force = 0.f; 
+    XRangeMin = 0.f; 
+    XRangeMax = 0.f; 
+    YRangeMin = 0.f; 
+    YRangeMax = 0.f;
+
     Health = 0;
     MoveSpeed = 1500.f;
     // 충돌시 자동 제거 등 추가 설정 가능
@@ -46,6 +54,7 @@ void AProjectile::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 
     // 1. 플레이어 방향 벡터
+    if (!CameraComp) return;
     FVector ToPlayer = CameraComp->GetComponentLocation() - GetActorLocation();
     FVector MoveDirection = ToPlayer.GetSafeNormal();
 

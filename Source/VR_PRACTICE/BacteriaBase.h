@@ -16,7 +16,7 @@ enum class EBacteriaState : uint8
     CustomBehavior
 };
 
-UCLASS()
+UCLASS(Blueprintable)
 class VR_PRACTICE_API ABacteriaBase : public AActor
 {
     GENERATED_BODY()
