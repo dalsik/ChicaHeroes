@@ -92,12 +92,12 @@ void ABacteriaBase::HitBac(AActor* Actor)
 {
     float HitDamage = 0.f;
     if (Actor->Tags.Contains("Bullet0")) {
-        HitDamage = 40.f;
+        HitDamage = 50.f;
         Actor->Destroy();
     }
     else if (Actor->Tags.Contains("Bullet1")) HitDamage = 30.f;
     else if (Actor->Tags.Contains("Bullet2")) {
-        HitDamage = 40.f;
+        HitDamage = 30.f;
         Actor->Destroy();
     }
     else if (Actor->ActorHasTag("Pistol")) {
@@ -141,7 +141,7 @@ void ABacteriaBase::TakeDamageBac(float HitDamage)
 
 void ABacteriaBase::TakeDamageBacPistol()
 {
-    TakeDamageBac(10.f);
+    TakeDamageBac(5.f);
 }
 
 void ABacteriaBase::Destroyed()
