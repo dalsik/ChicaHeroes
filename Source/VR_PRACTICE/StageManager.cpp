@@ -70,6 +70,7 @@ void AStageManager::Tick(float DeltaTime)
 		}
 		*/
 		bCleared = true;
+		UE_LOG(LogTemp, Warning, TEXT("GameClear"));
 		GameClear();
 	}
 }
