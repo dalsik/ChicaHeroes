@@ -11,14 +11,14 @@ AGemella::AGemella() {
     PrimaryActorTick.bCanEverTick = true;
 
     Health = 150.0f;
-    MaxSpeed = 300.0f;
-    MoveSpeed = 0.f;
+    MoveSpeed = 300.f;
     AttackRange = 1500.f;
+
+    Point = 5;
 }
 
-void AGemella::BeginPlay()
+void AGemella::ChildBegin()
 {
-    Super::BeginPlay();
     // 일정 시간마다 보호막 부여 함수 실행
     GetWorld()->GetTimerManager().SetTimer(
         ShieldGrantTimer,
@@ -34,23 +34,21 @@ void AGemella::OnDeath()
     GetWorld()->GetTimerManager().ClearTimer(ShieldGrantTimer);
 }
 
-void AGemella::Tick(float DeltaTime)
+void AGemella::performBehavior(float DeltaTime)
 {
-    Super::Tick(DeltaTime);
     if (!PlayerPawn || !CameraComp) return;
-    if (MaxSpeed > MoveSpeed) MoveSpeed += IncSpeed;
 
     FVector ToPlayer = PlayerPawn->GetActorLocation() - GetActorLocation();
     Distance = FVector::Dist(GetActorLocation(), CameraComp->GetComponentLocation());
     if (Distance > AttackRange)
     {
-        CurrentState = EGemellaState::Approaching;
+        SubState = EGemellaState::Approaching;
     }
     else {
-        CurrentState = EGemellaState::Wander;
+        SubState = EGemellaState::Wander;
     }
 
-    switch (CurrentState)
+    switch (SubState)
     {
     case EGemellaState::Approaching:
         MoveToward(CameraComp->GetComponentLocation(), DeltaTime);
@@ -87,7 +85,7 @@ void AGemella::GrantShieldsToNearbyBacteria()
     }
     // 5. 충돌 판정
     //UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), Distance);
-    if (CurrentState == EGemellaState::Wander)
+    if (SubState == EGemellaState::Wander)
     {
         OnPlayerAttacked.Broadcast(this);
         UGameplayStatics::ApplyDamage(PlayerPawn, AttackPower, nullptr, this, nullptr);

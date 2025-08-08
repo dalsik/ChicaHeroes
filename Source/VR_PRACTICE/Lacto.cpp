@@ -9,16 +9,14 @@ ALacto::ALacto() {
     PrimaryActorTick.bCanEverTick = true;
 
     Health = 150.0f;
-    MaxSpeed = 1000.0f;
-    MoveSpeed = 0.f;
+    MoveSpeed = 700.f;
+
+    Point = 30;
 }
 
-void ALacto::Tick(float DeltaTime)
+void ALacto::performBehavior(float DeltaTime)
 {
-    Super::Tick(DeltaTime);
-
     if (!PlayerPawn || !CameraComp) return;
-    if (MaxSpeed > MoveSpeed) MoveSpeed += IncSpeed;
 
     // 1. 플레이어 방향 벡터
     FVector ToPlayer = CameraComp->GetComponentLocation() - GetActorLocation();

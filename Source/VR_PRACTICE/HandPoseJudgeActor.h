@@ -7,6 +7,7 @@
 #include "ProgressToothActor.h"
 #include "ProgressRotatingActor.h"
 #include "ProgressRotatingActor2.h"
+#include "ProgressHUDActor.h"
 #include "HandPoseJudgeActor.generated.h"
 
 class USkeletalMeshComponent;
@@ -43,7 +44,7 @@ public:
 	float RotationTolerance = 30.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Progress")
-	float Progress = 10.0f;
+	float Progress = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Matching Settings")
 	float MatchingDistanceThreshold = 20.f; // 손 전체 위치 차이 허용
@@ -59,7 +60,12 @@ public:
 
 	UPROPERTY()
 	AProgressRotatingActor2* RotatingActor2;
-	
+
+	UPROPERTY()
+	AProgressHUDActor* ProgressWidget;  // Cast된 UUserWidget 포인터
+
+	UFUNCTION(BlueprintCallable)
+	float getProgress();
 private:
 	USkeletalMeshComponent* VRHandMesh_L = nullptr;
 	USkeletalMeshComponent* VRHandMesh_R = nullptr;

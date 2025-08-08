@@ -30,11 +30,20 @@ public:
 	void RegisterBacteria(ABacteriaBase* Bacteria);
 	void UnregisterBacteria(ABacteriaBase* Bacteria);
 
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* NiagaraEffect;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stage")
 	TArray<TSubclassOf<ABacteriaBase>> Enemy;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stage")
 	int EnemyCount;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TArray<FVector> SpawnPoint;
+
+	UPROPERTY(BlueprintReadWrite)
+	int SpawnPointNum = 5;
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<ABacteriaBase*> RegisteredBacteria;
@@ -64,11 +73,34 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Stage")
 	void TickDisable();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	APostProcessVolume* TargetPostProcessVolume;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stage")
+	bool Start = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	APawn* PlayerPawn;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
+	float SpawnRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Bounce")
+	float UptoDownRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bounce")
+	float DownToUpRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bounce")
+	float Force;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bounce")
+	float XRangeMin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bounce")
+	float XRangeMax;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bounce")
+	float YRangeMin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bounce")
+	float YRangeMax;
 
 	UPROPERTY(VisibleAnywhere, Category = "StageSystem")
 	float Time = 100.f;
@@ -80,7 +112,6 @@ public:
 	int StageNum = 0;
 
 private:
-	UNiagaraSystem* NiagaraEffect;
 
 	FTimerHandle SpawnTimerHandle;
 	FTimerHandle DelayStartHandle;
@@ -95,8 +126,10 @@ private:
 	bool bAllSpawned = false;
 
 	FVector SpawnOrigin;
-	float SpawnRadius;
+
 	void StartFirstStage();
 	void SpawnNextEnemy();
+
+	void PickRandomFourLocation(TArray<AActor*> SpawnPointArray);
 };
 

@@ -27,7 +27,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere)
-	ETreponemaState CurrentState = ETreponemaState::Approaching;
+	ETreponemaState SubState = ETreponemaState::Approaching;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AProjectile> ProjectileClass;
@@ -43,7 +43,8 @@ protected:
 
 	FVector RandomMoveTarget;
 
-	virtual void Tick(float DeltaTime) override;
+	
+	virtual void performBehavior(float DeltaTime) override;
 
 	void HandleAttackState(float DeltaTime);
 	void MoveToward(FVector TargetLocation, float DeltaTime);

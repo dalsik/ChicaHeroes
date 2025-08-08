@@ -9,22 +9,19 @@ APorphy::APorphy() {
     PrimaryActorTick.bCanEverTick = true;
 
     Health = 400.0f;
-    MaxSpeed = 250.0f;
-    MoveSpeed = 0.f;
+    MoveSpeed = 250.0f;
     AttackRange = 500.f;
 
+    Point = 50;
     NiagaraEffect = LoadObject<UNiagaraSystem>(
         nullptr,
         TEXT("/Game/Niagara/NS_LowPolyExplosion.NS_LowPolyExplosion")
     );
 }
 
-void APorphy::Tick(float DeltaTime)
+void APorphy::performBehavior(float DeltaTime)
 {
-    Super::Tick(DeltaTime);
-
     if (!PlayerPawn || !CameraComp) return;
-    if (MaxSpeed > MoveSpeed) MoveSpeed += IncSpeed;
 
     // 3. 전방위 회전 (X, Y, Z축으로 천천히)
     FRotator SpinRotation = FRotator(SpinSpeedX * DeltaTime, SpinSpeedY * DeltaTime, SpinSpeedZ * DeltaTime);
@@ -32,13 +29,13 @@ void APorphy::Tick(float DeltaTime)
     
     Distance = FVector::Dist(GetActorLocation(), CameraComp->GetComponentLocation());
     if (Distance < AttackRange) {
-        CurrentState = EPorphyState::Burst;
+        SubState = EPorphyState::Burst;
     }
     else {
-        CurrentState = EPorphyState::Approaching;
+        SubState = EPorphyState::Approaching;
     }
 
-    switch (CurrentState) {
+    switch (SubState) {
     case EPorphyState::Approaching:
         Approaching(DeltaTime);
         break;

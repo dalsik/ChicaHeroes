@@ -9,6 +9,13 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerAttacked, ABacteriaBase*, Attacker);
 
+UENUM(BlueprintType)
+enum class EBacteriaState : uint8
+{
+    Bounced,
+    CustomBehavior
+};
+
 UCLASS()
 class VR_PRACTICE_API ABacteriaBase : public AActor
 {
@@ -20,16 +27,24 @@ public:
     virtual void Tick(float DeltaTime) override;
     virtual void OnDeath() {};
 
-    // 예시: BacteriaBase.h
     UFUNCTION(BlueprintCallable, Category = "Bacteria")
-    virtual void TakeDamageBac();
+    virtual void TakeDamageBac(float Damage);
+
+    UFUNCTION(BlueprintCallable, Category = "Bacteria")
+    virtual void TakeDamageBacPistol();
+
+    UFUNCTION(BlueprintCallable, Category = "Bacteria")
+    virtual void HitBac(AActor* Actor);
 
     bool bShieldAnim = false;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shield")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit")
+    bool PistolOverlap = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit")
     bool Shield = false;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Shield")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hit")
     bool bShieldHitRecently = false;
 
     UPROPERTY(BlueprintAssignable)
@@ -44,9 +59,24 @@ public:
 
     float getHealth();
 
+    void Init(APawn* InPlayer, float UptoDownRate, float DownToUpRate, float Force, float XRangeMin, float XRangeMax, float YRangeMin, float YRangeMax);
+
+    // 플레이어 참조
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bacteria")
+    APawn* PlayerPawn;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bacteria")
+    int Point = 10;
+
 protected:
+    EBacteriaState CurrentState = EBacteriaState::Bounced;
+
     virtual void BeginPlay() override;
     virtual void Destroyed() override;
+
+    virtual void performBehavior(float DeltaTime);
+
+    void LaunchBounce();
 
     // 체력
     UPROPERTY(EditAnywhere, Category = "Bacteria")
@@ -63,7 +93,7 @@ protected:
 
     // 회전 속도
     UPROPERTY(EditAnywhere, Category = "Bacteria")
-    float TrackingSpeed = 0.8f;
+    float TrackingSpeed = 1.2f;
 
     // 공격 범위
     UPROPERTY(EditAnywhere, Category = "Bacteria")
@@ -72,10 +102,6 @@ protected:
     // 메시 컴포넌트
     UPROPERTY(VisibleAnywhere, Category = "Bacteria")
     UStaticMeshComponent* MeshComponent;
-
-    // 플레이어 참조
-    UPROPERTY(EditAnywhere, Category = "Bacteria")
-    APawn* PlayerPawn;
 
     UPROPERTY(VisibleAnywhere, Category = "Bacteria")
     float Distance;
@@ -97,4 +123,14 @@ protected:
     float SpinSpeedZ = 60.f;
 
     virtual void ChildBegin() {};
+
+    FTimerHandle SpawnTimerHandle;
+
+    float UptoDownRate = 0.f;
+    float DownToUpRate = 0.f;
+    float Force = 0.f;
+    float XRangeMin = 0.f;
+    float XRangeMax = 0.f;
+    float YRangeMin = 0.f;
+    float YRangeMax = 0.f;
 };
