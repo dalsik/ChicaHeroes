@@ -141,7 +141,7 @@ void ABacteriaBase::TakeDamageBac(float HitDamage)
 
 void ABacteriaBase::TakeDamageBacPistol()
 {
-    TakeDamageBac(20.f);
+    TakeDamageBac(5.f);
 }
 
 void ABacteriaBase::Destroyed()
