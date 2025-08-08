@@ -40,6 +40,7 @@ ABacteriaBase::ABacteriaBase()
 
     // 초기 체력
     Health = 100.0f;
+    ShieldHP = 0.f;
 }
 
 float ABacteriaBase::getHealth()
@@ -110,22 +111,19 @@ void ABacteriaBase::HitBac(AActor* Actor)
 
 void ABacteriaBase::TakeDamageBac(float HitDamage)
 {
-    if (bShieldHitRecently) return;
     float TempDam = ShieldHP - HitDamage;
     if (TempDam > 0.f) {
         ShieldHP = TempDam;
-        if (TempDam <= 0.f) {
-            bShieldHitRecently = true;
-            ShieldMesh->SetHiddenInGame(true);
-            GetWorldTimerManager().SetTimerForNextTick([this]()
-                {
-                    bShieldHitRecently = false;
-                });
-        }
     }
     else {
+        bShieldHitRecently = true;
+        ShieldMesh->SetHiddenInGame(true);
+        GetWorldTimerManager().SetTimerForNextTick([this]()
+            {
+                bShieldHitRecently = false;
+            });
         Shield = false;
-        Health -= TempDam;
+        Health += TempDam;
         UE_LOG(LogTemp, Warning, TEXT("Health: %f"), Health);
         if (Health <= 0.f) {
             OnDeath();
