@@ -236,3 +236,8 @@ float AHandPoseJudgeActor::getProgress()
 {
 	return Progress;
 }
+
+void AHandPoseJudgeActor::setProgress()
+{
+	Progress = 0.f;
+}

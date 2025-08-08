@@ -69,6 +69,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float getProgress();
+
+	UFUNCTION(BlueprintCallable)
+	void setProgress();
 private:
 	USkeletalMeshComponent* VRHandMesh_L = nullptr;
 	USkeletalMeshComponent* VRHandMesh_R = nullptr;
