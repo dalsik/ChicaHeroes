@@ -52,6 +52,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Effect")
 	UNiagaraSystem* MatchingEffect;
 
+	UPROPERTY(EditAnywhere, Category = "Sound");
+	USoundBase* MatchingSound;
+
 	UPROPERTY()
 	AProgressToothActor* ToothProgressActor;
 	
@@ -66,6 +69,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float getProgress();
+
+	UFUNCTION(BlueprintCallable)
+	void setProgress();
 private:
 	USkeletalMeshComponent* VRHandMesh_L = nullptr;
 	USkeletalMeshComponent* VRHandMesh_R = nullptr;

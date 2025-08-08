@@ -86,18 +86,12 @@ void AStageManager::StartFirstStage()
 
 void AStageManager::SpawnNextEnemy()
 {
-	int rand = FMath::RandRange(0, 1);
-	TSubclassOf<ABacteriaBase> CurrentClass = Enemy[rand];
-	if (CurrentClass && CurrentClass->FindPropertyByName(FName("CurrentState"))) {
-		if(CurrentClass->FindPropertyByName(FName("ShieldGrantInterval")))
-			if (FMath::RandRange(0, 4) > 0) CurrentClass = Enemy[(rand + 1) % 2];
-	}
 	FVector2D Rand2D = FMath::RandPointInCircle(SpawnRadius);
 	FVector Offset(Rand2D.X, Rand2D.Y, 0.f);
 	FVector SpawnLoc = SpawnPoint[FMath::RandRange(0, SpawnPointNum)] + Offset;
 	FRotator RandomRot = FRotator(0, 0, 0);
 	ABacteriaBase* SpawnedBacteria = GetWorld()->SpawnActorDeferred<ABacteriaBase>(
-		CurrentClass,
+		Enemy[0],
 		FTransform(RandomRot, SpawnLoc),
 		this,
 		nullptr,
@@ -120,14 +114,29 @@ void AStageManager::SpawnNextEnemy()
 			true                       // 파괴 시 자동 삭제 여부
 		);
 	}
-	EnemyCount--;
+	Enemy.RemoveAt(0);
 
-	if (EnemyCount <= 0)
+	if (Enemy.Num() <= 0)
 	{
 		if (StageNum == 2) bAllSpawned = true;
 		MonsterInfo();
 		GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
 	}
+}
+
+void AStageManager::PickEnemyInfo()
+{
+	FEnemyInfo* EnemyInfo = nullptr;
+	if (EnemyDataTable) {
+		TArray<FName> RowNames = EnemyDataTable->GetRowNames();
+		if (RowNames.Num() > 0) {
+			int32 RandomIndex = FMath::RandRange(0, RowNames.Num() - 1);
+			FName RandomRowName = RowNames[RandomIndex];
+			EnemyInfo = EnemyDataTable->FindRow<FEnemyInfo>(RandomRowName, TEXT(""));
+		}
+	}
+	for (int i = 0; i < EnemyInfo->Enemy1Count; i++) Enemy.Add(EnemyInfo->Enemy1);
+	for (int i = 0; i < EnemyInfo->Enemy2Count; i++) Enemy.Add(EnemyInfo->Enemy2);
 }
 
 void AStageManager::SpawnEnemy()
@@ -158,7 +167,7 @@ void AStageManager::SpawnEnemy()
 	GetWorld()->GetTimerManager().SetTimer(
 		SpawnTimerHandle, this,
 		&AStageManager::SpawnNextEnemy,
-		28.f / EnemyCount, true
+		1.0f, true
 	);
 }
 

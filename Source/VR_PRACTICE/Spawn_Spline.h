@@ -64,6 +64,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float MaxTravelDistance = 1000.0f;
-
+	
 	float SpawnTimer = 0.0f;
+
+	FTimerHandle SpawnDelayTimer;
+
+	bool bCanSpawn = false;
 };

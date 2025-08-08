@@ -7,6 +7,7 @@
 #include "BacteriaBase.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
+#include "EnemyInfo.h"
 #include "StageManager.generated.h"
 
 UCLASS()
@@ -30,14 +31,15 @@ public:
 	void RegisterBacteria(ABacteriaBase* Bacteria);
 	void UnregisterBacteria(ABacteriaBase* Bacteria);
 
+	// 언리얼 에디터에서 DT_StageData 에셋을 연결할 변수
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stage")
+	UDataTable* EnemyDataTable;
+
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* NiagaraEffect;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stage")
 	TArray<TSubclassOf<ABacteriaBase>> Enemy;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stage")
-	int EnemyCount;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<FVector> SpawnPoint;
@@ -65,6 +67,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Stage")
 	void MonsterInfo();
+
+	UFUNCTION(BlueprintCallable, Category = "Stage")
+	void PickEnemyInfo();
 
 	//UFUNCTION(BlueprintImplementableEvent, Category = "Stage")
 	//void SpawnEnemy();

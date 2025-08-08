@@ -208,12 +208,11 @@ void AHandPoseJudgeActor::CompareHandsAndUpdateProgress()
 						FRotator::ZeroRotator
 					);
 
-					static ConstructorHelpers::FObjectFinder<USoundBase>MatchingSoundAsset(TEXT("/All/Game/TeethPull_Correct"));
-					if (MatchingSoundAsset.Succeeded())
+					if (MatchingSound)
 					{
 						UGameplayStatics::PlaySoundAtLocation(
 							GetWorld(),
-							MatchingSoundAsset.Object,
+							MatchingSound,
 							SpawnedMesh->GetComponentLocation()
 						);
 					}
@@ -236,4 +235,9 @@ void AHandPoseJudgeActor::CompareHandsAndUpdateProgress()
 float AHandPoseJudgeActor::getProgress()
 {
 	return Progress;
+}
+
+void AHandPoseJudgeActor::setProgress()
+{
+	Progress = 0.f;
 }
