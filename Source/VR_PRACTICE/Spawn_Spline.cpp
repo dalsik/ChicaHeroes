@@ -73,7 +73,6 @@ void ASpawn_Spline::SpawnHand()
 {
 	if (!Target_L)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Target_L Skeletal Mesh is not assigned!"));
 		return;
 	}
 

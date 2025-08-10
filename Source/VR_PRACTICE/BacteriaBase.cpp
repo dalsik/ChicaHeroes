@@ -124,7 +124,6 @@ void ABacteriaBase::TakeDamageBac(float HitDamage)
             });
         Shield = false;
         Health += TempDam;
-        UE_LOG(LogTemp, Warning, TEXT("Health: %f"), Health);
         if (Health <= 0.f) {
             OnDeath();
             if (DeathEffect) {
