@@ -44,6 +44,9 @@ void AStageManager::HandlePlayerAttacked(ABacteriaBase* Attacker)
 	OnPlayerAttackedBP(Damage); // 블루프린트 연출 호출
 }
 
+bool bStage1EnemySpawned = false;
+bool bStage2EnemySpawned = false;
+
 // Called every frame
 void AStageManager::Tick(float DeltaTime)
 {
@@ -53,22 +56,24 @@ void AStageManager::Tick(float DeltaTime)
 
 	if(!bCleared) Time += DeltaTime;
 
-	if (StageNum == 1 && Time > 30.f) {
+	if (StageNum == 1 && Time > 30.f && !bStage1EnemySpawned) {
 		SpawnEnemy();
+		bStage1EnemySpawned = true;
 	}
-	else if (StageNum == 2 && Time > 60.f) {
+	else if (StageNum == 2 && Time > 60.f && !bStage2EnemySpawned) {
 		SpawnEnemy();
+		bStage2EnemySpawned = true;
 	}
 
-	if (bAllSpawned && RegisteredBacteria.IsEmpty()) {
+	if (!bCleared && bAllSpawned && RegisteredBacteria.IsEmpty()) {
 		/*
 		UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance());
 		if (GI) {
 			GI->bStageCleared = true;
 		}
 		*/
-		bCleared = true;
 		GameClear();
+		bCleared = true;
 	}
 }
 
@@ -88,14 +93,16 @@ void AStageManager::SpawnNextEnemy()
 	FVector Offset(Rand2D.X, Rand2D.Y, 0.f);
 	FVector SpawnLoc = SpawnPoint[FMath::RandRange(0, SpawnPointNum)] + Offset;
 	FRotator RandomRot = FRotator(0, 0, 0);
+	if (Enemy.Num() <= 0) return;
 	ABacteriaBase* SpawnedBacteria = GetWorld()->SpawnActorDeferred<ABacteriaBase>(
 		Enemy[0],
 		FTransform(RandomRot, SpawnLoc),
 		this,
 		nullptr,
 		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
-		);
+	);
 	if (SpawnedBacteria) {
+		RegisterBacteria(SpawnedBacteria);
 		SpawnedBacteria->Init(PlayerPawn, UptoDownRate, DownToUpRate, Force, XRangeMin, XRangeMax, YRangeMin, YRangeMax);
 		UGameplayStatics::FinishSpawningActor(SpawnedBacteria, FTransform(RandomRot, SpawnLoc));
 	}

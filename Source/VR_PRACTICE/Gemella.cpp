@@ -58,6 +58,7 @@ void AGemella::performBehavior(float DeltaTime)
         HandleAttackState(DeltaTime);
         break;
     }
+    TakeDamageBac(0.01f);
 }
 
 void AGemella::GrantShieldsToNearbyBacteria()
