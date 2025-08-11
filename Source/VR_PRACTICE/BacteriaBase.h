@@ -37,6 +37,9 @@ public:
     virtual void HitBac(AActor* Actor);
 
     UFUNCTION(BlueprintCallable, Category = "Bacteria")
+    virtual void Unregister();
+
+    UFUNCTION(BlueprintCallable, Category = "Bacteria")
     virtual void ClearTimer();
 
     bool bShieldAnim = false;
@@ -80,7 +83,6 @@ protected:
     UNiagaraSystem* DeathEffect;
 
     virtual void BeginPlay() override;
-    virtual void Destroyed() override;
 
     virtual void performBehavior(float DeltaTime);
 

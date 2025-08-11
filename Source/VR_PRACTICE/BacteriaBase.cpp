@@ -52,11 +52,6 @@ void ABacteriaBase::BeginPlay()
 {
     Super::BeginPlay();
 
-    AStageManager* StageManager = Cast<AStageManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStageManager::StaticClass()));
-    if (StageManager)
-    {
-        StageManager->RegisterBacteria(this);
-    }
     // 머티리얼/스케일/위치/투명도 등 추가 세팅
     ShieldMesh->SetVisibility(Shield); // 처음엔 안 보이게
     ShieldMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision); // 충돌 X
@@ -109,6 +104,15 @@ void ABacteriaBase::HitBac(AActor* Actor)
     TakeDamageBac(HitDamage);
 }
 
+void ABacteriaBase::Unregister()
+{
+    AStageManager* StageManager = Cast<AStageManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStageManager::StaticClass()));
+    if (StageManager)
+    {
+        StageManager->UnregisterBacteria(this);
+    }
+}
+
 void ABacteriaBase::TakeDamageBac(float HitDamage)
 {
     float TempDam = ShieldHP - HitDamage;
@@ -141,17 +145,6 @@ void ABacteriaBase::TakeDamageBac(float HitDamage)
 void ABacteriaBase::TakeDamageBacPistol()
 {
     TakeDamageBac(5.f);
-}
-
-void ABacteriaBase::Destroyed()
-{
-    Super::Destroyed();
-
-    AStageManager* StageManager = Cast<AStageManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStageManager::StaticClass()));
-    if (StageManager)
-    {
-        StageManager->UnregisterBacteria(this);
-    }
 }
 
 void ABacteriaBase::performBehavior(float DeltaTime)

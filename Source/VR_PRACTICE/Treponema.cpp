@@ -44,6 +44,7 @@ void ATreponema::performBehavior(float DeltaTime) {
         HandleAttackState(DeltaTime);
         break;
     }
+    TakeDamageBac(0.01f);
 }
 
 void ATreponema::HandleAttackState(float DeltaTime)
