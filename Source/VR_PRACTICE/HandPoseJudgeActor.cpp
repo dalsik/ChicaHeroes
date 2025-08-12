@@ -61,13 +61,13 @@ void AHandPoseJudgeActor::BeginPlay()
 	for (TActorIterator<ASpawn_Spline> It(GetWorld()); It; ++It)
 	{
 		// GetActorLabel() 대신 GetActorNameOrLabel()을 사용합니다.
-		const FString NameOrLabel = It->GetActorNameOrLabel();
+		//const FString NameOrLabel = It->tags
 
-		if (NameOrLabel.Contains(TEXT("MySpawn_Spline_L")))
+		if (It->Tags.Contains(TEXT("MySpawn_Spline_L")))
 		{
 			SpawnedSplineActor_L = *It;
 		}
-		else if (NameOrLabel.Contains(TEXT("MySpawn_Spline_R")))
+		else if (It->Tags.Contains(TEXT("MySpawn_Spline_R")))
 		{
 			SpawnedSplineActor_R = *It;
 		}
