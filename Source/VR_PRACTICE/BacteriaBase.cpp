@@ -57,6 +57,10 @@ void ABacteriaBase::BeginPlay()
     ShieldMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision); // 충돌 X
     ShieldMesh->SetWorldScale3D(GetActorScale3D() * 2.f); // 본체보다 조금 크게
 
+    AStageManager* StageManager = Cast<AStageManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStageManager::StaticClass()));
+    if (StageManager) {
+        StageManager->RegisterBacteria(this);
+    }
     LaunchBounce();
     ChildBegin();
 }

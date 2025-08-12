@@ -105,7 +105,7 @@ void AStageManager::SpawnNextEnemy()
 		ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
 	);
 	if (SpawnedBacteria) {
-		RegisterBacteria(SpawnedBacteria);
+		//RegisterBacteria(SpawnedBacteria);
 		SpawnedBacteria->Init(PlayerPawn, UptoDownRate, DownToUpRate, Force, XRangeMin, XRangeMax, YRangeMin, YRangeMax);
 		UGameplayStatics::FinishSpawningActor(SpawnedBacteria, FTransform(RandomRot, SpawnLoc));
 	}
