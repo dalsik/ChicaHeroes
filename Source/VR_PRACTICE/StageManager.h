@@ -116,6 +116,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StageSystem")
 	int StageNum = 0;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StageSystem")
+	bool bAllSpawned = false;
+
 private:
 
 	FTimerHandle SpawnTimerHandle;
@@ -128,7 +131,6 @@ private:
 	int32 Count;
 
 	int32 SpawnPhase; // 1 ¶Ç´Â 2
-	bool bAllSpawned = false;
 
 	FVector SpawnOrigin;
 

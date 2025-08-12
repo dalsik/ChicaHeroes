@@ -120,13 +120,9 @@ void ABacteriaBase::TakeDamageBac(float HitDamage)
         ShieldHP = TempDam;
     }
     else {
-        bShieldHitRecently = true;
         ShieldMesh->SetHiddenInGame(true);
-        GetWorldTimerManager().SetTimerForNextTick([this]()
-            {
-                bShieldHitRecently = false;
-            });
         Shield = false;
+        ShieldHP = 0.f;
         Health += TempDam;
         if (Health <= 0.f) {
             OnDeath();

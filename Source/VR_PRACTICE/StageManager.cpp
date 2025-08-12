@@ -44,9 +44,6 @@ void AStageManager::HandlePlayerAttacked(ABacteriaBase* Attacker)
 	OnPlayerAttackedBP(Damage); // 블루프린트 연출 호출
 }
 
-bool bStage1EnemySpawned = false;
-bool bStage2EnemySpawned = false;
-
 // Called every frame
 void AStageManager::Tick(float DeltaTime)
 {
@@ -56,16 +53,22 @@ void AStageManager::Tick(float DeltaTime)
 
 	if(!bCleared) Time += DeltaTime;
 
-	if (StageNum == 1 && Time > 30.f && !bStage1EnemySpawned) {
+	if (StageNum == 1 && Time > 30.f) {
 		SpawnEnemy();
-		bStage1EnemySpawned = true;
 	}
-	else if (StageNum == 2 && Time > 60.f && !bStage2EnemySpawned) {
+	else if (StageNum == 2 && Time > 60.f) {
 		SpawnEnemy();
-		bStage2EnemySpawned = true;
 	}
 
-	if (!bCleared && bAllSpawned && RegisteredBacteria.IsEmpty()) {
+	if (bCleared) return;
+	if (Time > 110.f) {
+		
+		for (ABacteriaBase* B : RegisteredBacteria) {
+			B->Destroy();
+		}
+	}
+
+	if (bAllSpawned&& RegisteredBacteria.IsEmpty()) {
 		/*
 		UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance());
 		if (GI) {
@@ -123,7 +126,7 @@ void AStageManager::SpawnNextEnemy()
 
 	if (Enemy.Num() <= 0)
 	{
-		if (StageNum == 2) bAllSpawned = true;
+		if (StageNum == 3) bAllSpawned = true;
 		MonsterInfo();
 		GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
 	}
