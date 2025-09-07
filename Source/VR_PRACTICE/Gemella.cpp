@@ -58,6 +58,7 @@ void AGemella::performBehavior(float DeltaTime)
         HandleAttackState(DeltaTime);
         break;
     }
+    TakeDamageBac(0.01f);
 }
 
 void AGemella::GrantShieldsToNearbyBacteria()
@@ -81,7 +82,6 @@ void AGemella::GrantShieldsToNearbyBacteria()
             Bacteria->ShieldHP = ShieldPoint;
             Bacteria->Shield = true;
             Bacteria->ShieldMesh->SetVisibility(true);
-            UE_LOG(LogTemp, Log, TEXT("[Gemella] %s에게 보호막 부여"), *Bacteria->GetName());
         }
     }
     // 5. 충돌 판정

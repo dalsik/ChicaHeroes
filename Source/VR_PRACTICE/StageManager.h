@@ -38,7 +38,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* NiagaraEffect;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stage")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stage")
 	TArray<TSubclassOf<ABacteriaBase>> Enemy;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -47,7 +47,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	int SpawnPointNum = 5;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<ABacteriaBase*> RegisteredBacteria;
 
 	UFUNCTION()
@@ -107,14 +107,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bounce")
 	float YRangeMax;
 
-	UPROPERTY(VisibleAnywhere, Category = "StageSystem")
+	UPROPERTY(EditAnywhere, Category = "StageSystem")
 	float Time = 100.f;
 
 	UPROPERTY(BlueprintReadWrite)
 	bool bCleared = false;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "StageSystem")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StageSystem")
 	int StageNum = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StageSystem")
+	bool bAllSpawned = false;
 
 private:
 
@@ -128,7 +131,6 @@ private:
 	int32 Count;
 
 	int32 SpawnPhase; // 1 ¶Ç´Â 2
-	bool bAllSpawned = false;
 
 	FVector SpawnOrigin;
 

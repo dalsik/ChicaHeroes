@@ -22,7 +22,6 @@ void AProgressRotatingActor2::BeginPlay()
 			{
 				RotateComp = Mesh;
 				InitialRotation = RotateComp->GetRelativeRotation();
-				UE_LOG(LogTemp, Warning, TEXT("✅ 회전 메시2 할당됨: %s"), *RotateComp->GetName());
 				break;
 			}
 		}
@@ -46,11 +45,9 @@ void AProgressRotatingActor2::OnProgressUpdate_Rot(float NewProgress)
 {
 	CurrentProgress = FMath::Clamp(NewProgress, 0.f, 100.f);
 
-	UE_LOG(LogTemp, Warning, TEXT("📦 회전용 진행도 갱신: %.1f"), CurrentProgress);
 
 	const float NormalizedProgress = CurrentProgress / 100.f;
 	const float SineValue = FMath::Sin(NormalizedProgress * PI);
-	UE_LOG(LogTemp, Warning, TEXT("NorProgress: %.1f, SineValue: %.1f"), NormalizedProgress, SineValue);
 
 	TargetRotation = InitialRotation + MaxRotationOffset * SineValue;
 }

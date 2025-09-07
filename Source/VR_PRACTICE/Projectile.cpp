@@ -67,7 +67,6 @@ void AProjectile::Tick(float DeltaTime)
     if (Distance < AttackRange)
     {
         OnPlayerAttacked.Broadcast(this);
-        UE_LOG(LogTemp, Warning, TEXT("АјАн!"));
         UGameplayStatics::ApplyDamage(PlayerPawn, AttackPower, nullptr, this, nullptr);
         Destroy();
     }

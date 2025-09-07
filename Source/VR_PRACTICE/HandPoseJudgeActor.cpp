@@ -48,12 +48,10 @@ void AHandPoseJudgeActor::BeginPlay()
 				if (Mesh->GetName().Contains(TEXT("HandLeft")))
 				{
 					VRHandMesh_L = Mesh;
-					UE_LOG(LogTemp, Warning, TEXT("✅ 왼손 메시 할당됨: %s"), *Mesh->GetName());
 				}
 				else if (Mesh->GetName().Contains(TEXT("HandRight")))
 				{
 					VRHandMesh_R = Mesh;
-					UE_LOG(LogTemp, Warning, TEXT("✅ 오른손 메시 할당됨: %s"), *Mesh->GetName());
 				}
 			}
 		}
@@ -62,17 +60,16 @@ void AHandPoseJudgeActor::BeginPlay()
 	// ✅ SpawnSpline 자동 할당
 	for (TActorIterator<ASpawn_Spline> It(GetWorld()); It; ++It)
 	{
-		const FString Label = It->GetActorLabel();
+		// GetActorLabel() 대신 GetActorNameOrLabel()을 사용합니다.
+		//const FString NameOrLabel = It->tags
 
-		if (Label.Contains(TEXT("MySpawn_Spline_L")))
+		if (It->Tags.Contains(TEXT("MySpawn_Spline_L")))
 		{
 			SpawnedSplineActor_L = *It;
-			UE_LOG(LogTemp, Warning, TEXT("✅ 왼손 SpawnedSplineActor 할당됨: %s"), *Label);
 		}
-		else if (Label.Contains(TEXT("MySpawn_Spline_R")))
+		else if (It->Tags.Contains(TEXT("MySpawn_Spline_R")))
 		{
 			SpawnedSplineActor_R = *It;
-			UE_LOG(LogTemp, Warning, TEXT("✅ 오른손 SpawnedSplineActor 할당됨: %s"), *Label);
 		}
 	}
 
@@ -80,7 +77,6 @@ void AHandPoseJudgeActor::BeginPlay()
 	for (TActorIterator<AProgressToothActor> It(GetWorld()); It; ++It)
 	{
 		ToothProgressActor = *It;
-		UE_LOG(LogTemp, Warning, TEXT("🦷 ToothProgressActor 할당됨: %s"), *ToothProgressActor->GetName());
 		break;
 	}
 
@@ -88,7 +84,6 @@ void AHandPoseJudgeActor::BeginPlay()
 	for (TActorIterator<AProgressRotatingActor> It(GetWorld()); It; ++It)
 	{
 		RotatingActor = *It;
-		UE_LOG(LogTemp, Warning, TEXT("🦷 RotatingActor 할당됨: %s"), *RotatingActor->GetName());
 		break;
 	}
 
@@ -96,7 +91,6 @@ void AHandPoseJudgeActor::BeginPlay()
 	for (TActorIterator<AProgressRotatingActor2> It(GetWorld()); It; ++It)
 	{
 		RotatingActor2 = *It;
-		UE_LOG(LogTemp, Warning, TEXT("🦷 RotatingActor2 할당됨: %s"), *RotatingActor2->GetName());
 		break;
 	}
 }
@@ -113,7 +107,6 @@ void AHandPoseJudgeActor::CompareHandsAndUpdateProgress()
 	{
 		if (!Logonce)
 		{
-			UE_LOG(LogTemp, Error, TEXT("❌ 손 메시 또는 Spawn 액터 미할당"));
 			Logonce = true;
 		}
 		return;

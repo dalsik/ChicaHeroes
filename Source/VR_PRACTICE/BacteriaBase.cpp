@@ -52,16 +52,15 @@ void ABacteriaBase::BeginPlay()
 {
     Super::BeginPlay();
 
-    AStageManager* StageManager = Cast<AStageManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStageManager::StaticClass()));
-    if (StageManager)
-    {
-        StageManager->RegisterBacteria(this);
-    }
     // 머티리얼/스케일/위치/투명도 등 추가 세팅
     ShieldMesh->SetVisibility(Shield); // 처음엔 안 보이게
     ShieldMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision); // 충돌 X
     ShieldMesh->SetWorldScale3D(GetActorScale3D() * 2.f); // 본체보다 조금 크게
 
+    AStageManager* StageManager = Cast<AStageManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStageManager::StaticClass()));
+    if (StageManager) {
+        StageManager->RegisterBacteria(this);
+    }
     LaunchBounce();
     ChildBegin();
 }
@@ -109,6 +108,15 @@ void ABacteriaBase::HitBac(AActor* Actor)
     TakeDamageBac(HitDamage);
 }
 
+void ABacteriaBase::Unregister()
+{
+    AStageManager* StageManager = Cast<AStageManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStageManager::StaticClass()));
+    if (StageManager)
+    {
+        StageManager->UnregisterBacteria(this);
+    }
+}
+
 void ABacteriaBase::TakeDamageBac(float HitDamage)
 {
     float TempDam = ShieldHP - HitDamage;
@@ -116,15 +124,10 @@ void ABacteriaBase::TakeDamageBac(float HitDamage)
         ShieldHP = TempDam;
     }
     else {
-        bShieldHitRecently = true;
         ShieldMesh->SetHiddenInGame(true);
-        GetWorldTimerManager().SetTimerForNextTick([this]()
-            {
-                bShieldHitRecently = false;
-            });
         Shield = false;
+        ShieldHP = 0.f;
         Health += TempDam;
-        UE_LOG(LogTemp, Warning, TEXT("Health: %f"), Health);
         if (Health <= 0.f) {
             OnDeath();
             if (DeathEffect) {
@@ -142,17 +145,6 @@ void ABacteriaBase::TakeDamageBac(float HitDamage)
 void ABacteriaBase::TakeDamageBacPistol()
 {
     TakeDamageBac(5.f);
-}
-
-void ABacteriaBase::Destroyed()
-{
-    Super::Destroyed();
-
-    AStageManager* StageManager = Cast<AStageManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AStageManager::StaticClass()));
-    if (StageManager)
-    {
-        StageManager->UnregisterBacteria(this);
-    }
 }
 
 void ABacteriaBase::performBehavior(float DeltaTime)
