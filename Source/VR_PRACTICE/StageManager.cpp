@@ -61,14 +61,8 @@ void AStageManager::Tick(float DeltaTime)
 	}
 
 	if (bCleared) return;
-	if (Time > 110.f) {
-		
-		for (ABacteriaBase* B : RegisteredBacteria) {
-			B->Destroy();
-		}
-	}
 
-	if (bAllSpawned&& RegisteredBacteria.IsEmpty()) {
+	if (bAllSpawned&& RegisteredBacteria.IsEmpty() || Time > 100.f) {
 		/*
 		UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance());
 		if (GI) {
