@@ -65,6 +65,10 @@
           <td>VR 미니게임 / 액션</td>
         </tr>
         <tr>
+          <td>개발기간</td>
+          <td>25.06 ~ 25.12</td>
+        </tr>
+        <tr>
           <td>플랫폼</td>
           <td>Meta Quest 2</td>
         </tr>
