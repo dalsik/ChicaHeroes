@@ -11,7 +11,7 @@
 #include "HandPoseJudgeActor.generated.h"
 
 class USkeletalMeshComponent;
-class ASpawn_Spline; // ✅ 너가 만든 손 생성 액터 클래스!
+class ASpawn_Spline;
 
 UCLASS()
 class VR_PRACTICE_API AHandPoseJudgeActor : public AActor
