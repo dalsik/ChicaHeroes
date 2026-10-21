@@ -6,7 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "Particles/ParticleSystem.h"
 #include "Kismet/GameplayStatics.h"
-#include "NiagaraSystem.h" // 꼭 추가!
+#include "NiagaraSystem.h" 
 
 AHandPoseJudgeActor::AHandPoseJudgeActor()
 {
@@ -35,7 +35,7 @@ void AHandPoseJudgeActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ✅ VRHandMesh 왼손/오른손 자동 할당
+	// VRHandMesh 왼손/오른손 자동 할당
 	for (TActorIterator<APawn> It(GetWorld()); It; ++It)
 	{
 		TArray<USkeletalMeshComponent*> Meshes;
@@ -57,7 +57,7 @@ void AHandPoseJudgeActor::BeginPlay()
 		}
 	}
 
-	// ✅ SpawnSpline 자동 할당
+	// SpawnSpline 자동 할당
 	for (TActorIterator<ASpawn_Spline> It(GetWorld()); It; ++It)
 	{
 		// GetActorLabel() 대신 GetActorNameOrLabel()을 사용합니다.
@@ -114,7 +114,7 @@ void AHandPoseJudgeActor::CompareHandsAndUpdateProgress()
 
 	bool bAnyMatch = false;
 
-	// ✋ 왼손/오른손 각각 비교
+	// 왼손/오른손 각각 비교
 	struct FHandMatchConfig
 	{
 		FString Label;
@@ -136,12 +136,12 @@ void AHandPoseJudgeActor::CompareHandsAndUpdateProgress()
 			USkeletalMeshComponent* SpawnedMesh = Tooth.MeshComp;
 			if (!SpawnedMesh || !Tooth.Actor) continue;
 
-			// 📏 루트 거리 확인
+			// 루트 거리 확인
 			const float Dist = FVector::Dist(
 				Hand.HandMesh->GetComponentLocation(),
 				SpawnedMesh->GetComponentLocation());
 
-			//UE_LOG(LogTemp, Log, TEXT("📏 [%s] 루트 거리: %.2f (허용: %.2f)"), *Hand.Label, Dist, MatchingDistanceThreshold);
+			//UE_LOG(LogTemp, Log, TEXT("[%s] 루트 거리: %.2f (허용: %.2f)"), *Hand.Label, Dist, MatchingDistanceThreshold);
 
 			if (Dist > MatchingDistanceThreshold) continue;
 
@@ -156,7 +156,7 @@ void AHandPoseJudgeActor::CompareHandsAndUpdateProgress()
 				const float RotDiff = VRBoneWorld.GetRotation().AngularDistance(SpawnedBoneWorld.GetRotation()) * (180.f / PI);
 
 				/*UE_LOG(LogTemp, Log,
-					TEXT("🔍 [%s] Bone: %s | PosDiff: %.2f | RotDiff: %.2f"),
+					TEXT("[%s] Bone: %s | PosDiff: %.2f | RotDiff: %.2f"),
 					*Hand.Label, *Bone.ToString(), PosDiff, RotDiff);
 					*/
 				if (PosDiff <= PositionTolerance && RotDiff <= RotationTolerance)
@@ -165,7 +165,7 @@ void AHandPoseJudgeActor::CompareHandsAndUpdateProgress()
 				}
 			}
 
-			//UE_LOG(LogTemp, Log, TEXT("📊 [%s] 매칭된 본 수: %d / %d"), *Hand.Label, MatchedCount, Hand.BoneList.Num());
+			//UE_LOG(LogTemp, Log, TEXT("[%s] 매칭된 본 수: %d / %d"), *Hand.Label, MatchedCount, Hand.BoneList.Num());
 
 			if (MatchedCount >= 4)
 			{
@@ -190,7 +190,7 @@ void AHandPoseJudgeActor::CompareHandsAndUpdateProgress()
 					RotatingActor2->OnProgressUpdate_Rot(Progress);
 				}
 
-				// ✅ 파티클 이펙트 생성
+				// 파티클 이펙트 생성
 				if (MatchingEffect)
 				{
 					Progress += 5.0f;
@@ -221,7 +221,7 @@ void AHandPoseJudgeActor::CompareHandsAndUpdateProgress()
 
 	if (!bAnyMatch)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("❌ 손 포즈 불일치 (가까운 손은 있었지만 포즈 미일치)"));
+		//UE_LOG(LogTemp, Warning, TEXT("손 포즈 불일치 (가까운 손은 있었지만 포즈 미일치)"));
 	}
 }
 
